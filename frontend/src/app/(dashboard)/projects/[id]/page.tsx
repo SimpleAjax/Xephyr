@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,11 +31,11 @@ import Link from 'next/link';
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
 
 interface ProjectPageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 export default function ProjectPage({ params }: ProjectPageProps) {
-  const { id } = use(params);
+  const { id } = params;
   const [viewMode, setViewMode] = useState<'list' | 'hierarchy'>('hierarchy');
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
