@@ -375,12 +375,12 @@ export function CreateTaskDialog({ open, onOpenChange, defaultProjectId, parentT
 
               <div className="space-y-2">
                 <Label>Assignee</Label>
-                <Select value={assigneeId} onValueChange={setAssigneeId}>
+                <Select value={assigneeId || 'unassigned'} onValueChange={(v) => setAssigneeId(v === 'unassigned' ? '' : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Unassigned" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Unassigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
                     {users.filter((u: UserType) => u.role === 'member').map((user: UserType) => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.name}
