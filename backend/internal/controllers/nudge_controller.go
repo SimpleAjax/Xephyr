@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // NudgeController handles nudge-related HTTP requests
@@ -34,6 +34,7 @@ func NewNudgeController(service services.NudgeService) *NudgeController {
 // @Param limit query int false "Limit results" default(20)
 // @Param offset query int false "Offset for pagination" default(0)
 // @Success 200 {object} dto.ApiResponse{data=dto.NudgeListResponse,meta=dto.ResponseMeta}
+// @Security BearerAuth
 // @Router /nudges [get]
 func (c *NudgeController) ListNudges(ctx *gin.Context) {
 	var params dto.NudgeListQueryParams
@@ -72,6 +73,7 @@ func (c *NudgeController) ListNudges(ctx *gin.Context) {
 // @Param nudgeId path string true "Nudge ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.NudgeDetailResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /nudges/{nudgeId} [get]
 func (c *NudgeController) GetNudge(ctx *gin.Context) {
 	nudgeID := ctx.Param("nudgeId")
@@ -99,6 +101,7 @@ func (c *NudgeController) GetNudge(ctx *gin.Context) {
 // @Param request body dto.NudgeActionRequest true "Action request"
 // @Success 200 {object} dto.ApiResponse{data=dto.NudgeActionResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /nudges/{nudgeId}/actions [post]
 func (c *NudgeController) TakeNudgeAction(ctx *gin.Context) {
 	nudgeID := ctx.Param("nudgeId")
@@ -134,6 +137,7 @@ func (c *NudgeController) TakeNudgeAction(ctx *gin.Context) {
 // @Param request body dto.UpdateNudgeStatusRequest true "Status update request"
 // @Success 200 {object} dto.ApiResponse{data=dto.NudgeResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /nudges/{nudgeId}/status [patch]
 func (c *NudgeController) UpdateNudgeStatus(ctx *gin.Context) {
 	nudgeID := ctx.Param("nudgeId")
@@ -166,6 +170,7 @@ func (c *NudgeController) UpdateNudgeStatus(ctx *gin.Context) {
 // @Param request body dto.GenerateNudgesRequest true "Generation request"
 // @Success 202 {object} dto.ApiResponse{data=dto.IDResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /nudges/generate [post]
 func (c *NudgeController) GenerateNudges(ctx *gin.Context) {
 	var req dto.GenerateNudgesRequest
@@ -195,6 +200,7 @@ func (c *NudgeController) GenerateNudges(ctx *gin.Context) {
 // @Produce json
 // @Param period query string false "Time period" default(30d)
 // @Success 200 {object} dto.ApiResponse{data=dto.NudgeStatsResponse}
+// @Security BearerAuth
 // @Router /nudges/stats [get]
 func (c *NudgeController) GetNudgeStats(ctx *gin.Context) {
 	var params dto.NudgeStatsQueryParams

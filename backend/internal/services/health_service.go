@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // HealthService defines the interface for health-related operations

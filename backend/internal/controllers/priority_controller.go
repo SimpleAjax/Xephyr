@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // PriorityController handles priority-related HTTP requests
@@ -29,6 +29,7 @@ func NewPriorityController(service services.PriorityService) *PriorityController
 // @Param taskId path string true "Task ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.TaskPriorityResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /priorities/tasks/{taskId} [get]
 func (c *PriorityController) GetTaskPriority(ctx *gin.Context) {
 	taskID := ctx.Param("taskId")
@@ -55,6 +56,7 @@ func (c *PriorityController) GetTaskPriority(ctx *gin.Context) {
 // @Param request body dto.BulkPriorityRequest true "Bulk priority request"
 // @Success 200 {object} dto.ApiResponse{data=dto.BulkPriorityResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /priorities/tasks/bulk [post]
 func (c *PriorityController) GetBulkTaskPriorities(ctx *gin.Context) {
 	var req dto.BulkPriorityRequest
@@ -90,6 +92,7 @@ func (c *PriorityController) GetBulkTaskPriorities(ctx *gin.Context) {
 // @Param offset query int false "Pagination offset" default(0)
 // @Success 200 {object} dto.ApiResponse{data=dto.ProjectTaskRankingResponse,meta=dto.ResponseMeta}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /priorities/projects/{projectId}/ranking [get]
 func (c *PriorityController) GetProjectTaskRanking(ctx *gin.Context) {
 	projectID := ctx.Param("projectId")
@@ -128,6 +131,7 @@ func (c *PriorityController) GetProjectTaskRanking(ctx *gin.Context) {
 // @Success 200 {object} dto.ApiResponse{data=dto.RecalculatePrioritySyncResponse}
 // @Success 202 {object} dto.ApiResponse{data=dto.RecalculatePriorityAsyncResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /priorities/recalculate [post]
 func (c *PriorityController) RecalculatePriorities(ctx *gin.Context) {
 	var req dto.RecalculatePriorityRequest
@@ -158,6 +162,6 @@ func (c *PriorityController) RecalculatePriorities(ctx *gin.Context) {
 }
 
 // Helper function
-func getTimestamp() string {
-	return uuid.New().String()[:8]
+func getTimestamp() time.Time {
+	return time.Now().UTC()
 }

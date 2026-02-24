@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // AssignmentService defines the interface for assignment-related operations
@@ -83,10 +83,48 @@ func (s *DummyAssignmentService) GetAssignmentSuggestions(ctx context.Context, t
 					WorkloadBalance: 10,
 					PastPerformance: 8,
 				},
+				SkillMatchDetails: []dto.SkillMatchDetail{
+					{SkillID: "skill-react", Required: true, HasSkill: true, Proficiency: 3, MatchScore: 10},
+					{SkillID: "skill-ts", Required: true, HasSkill: true, Proficiency: 3, MatchScore: 10},
+					{SkillID: "skill-node", Required: true, HasSkill: true, Proficiency: 2, MatchScore: 5},
+				},
+				ContextSwitchAnalysis: dto.ContextSwitchAnalysis{
+					ActiveProjects:  3,
+					CurrentWorkload: 110,
+					SwitchPenalty:   10,
+					RiskLevel:       "high",
+				},
 				Warnings: []string{
 					"Currently at 110% allocation",
 				},
 				AIExplanation: "Alex has strong frontend skills but is currently overallocated.",
+			},
+			{
+				Rank:  3,
+				Score: 65,
+				Person: dto.PersonInfo{
+					ID:   "user-sarah",
+					Name: "Sarah Chen",
+				},
+				Breakdown: dto.CandidateBreakdown{
+					SkillMatch:      25,
+					Availability:    25,
+					WorkloadBalance: 10,
+					PastPerformance: 5,
+				},
+				SkillMatchDetails: []dto.SkillMatchDetail{
+					{SkillID: "skill-react", Required: true, HasSkill: true, Proficiency: 3, MatchScore: 8},
+					{SkillID: "skill-ts", Required: true, HasSkill: true, Proficiency: 2, MatchScore: 5},
+					{SkillID: "skill-node", Required: true, HasSkill: true, Proficiency: 2, MatchScore: 5},
+				},
+				ContextSwitchAnalysis: dto.ContextSwitchAnalysis{
+					ActiveProjects:  1,
+					CurrentWorkload: 60,
+					SwitchPenalty:   3,
+					RiskLevel:       "medium",
+				},
+				Warnings:      []string{},
+				AIExplanation: "Sarah has good availability and moderate skills in all required areas.",
 			},
 		},
 		UnassignableReason: nil,
@@ -109,7 +147,7 @@ func (s *DummyAssignmentService) AssignTask(ctx context.Context, taskID string, 
 		Impact: dto.AssignmentImpact{
 			WorkloadUpdated:   true,
 			NewAllocation:     65,
-			NudgesGenerated:   []string{},
+			NudgesGenerated:   []string{"nudge-overallocation-1"},
 			NotificationsSent: []string{req.PersonID},
 		},
 	}, nil

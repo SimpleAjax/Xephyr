@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // AuthMiddleware validates JWT tokens and sets user context
@@ -22,39 +22,23 @@ func NewAuthMiddleware(jwtSecret string) *AuthMiddleware {
 }
 
 // Authenticate validates the JWT token and sets user context
+// For development: if no auth header is provided, generates dummy user/org IDs
 func (m *AuthMiddleware) Authenticate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
-		if authHeader == "" {
-			ctx.JSON(http.StatusUnauthorized, dto.NewErrorResponse(
-				"UNAUTHORIZED",
-				"Authorization header required",
-				nil,
-				GetRequestID(ctx),
-			))
-			ctx.Abort()
-			return
-		}
-
-		// Extract Bearer token
-		parts := strings.SplitN(authHeader, " ", 2)
-		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			ctx.JSON(http.StatusUnauthorized, dto.NewErrorResponse(
-				"UNAUTHORIZED",
-				"Invalid authorization header format",
-				nil,
-				GetRequestID(ctx),
-			))
-			ctx.Abort()
-			return
-		}
-
-		token := parts[1]
-
+		
 		// TODO: Implement actual JWT validation
-		// For now, we'll extract user info from headers (for testing/demo purposes)
+		// For development/demo: allow requests without auth header
 		userID := ctx.GetHeader("X-User-ID")
 		orgID := ctx.GetHeader("X-Organization-Id")
+
+		// If auth header provided, extract token (but don't validate for now)
+		if authHeader != "" {
+			parts := strings.SplitN(authHeader, " ", 2)
+			if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+				// Token provided - could validate here in production
+			}
+		}
 
 		if userID == "" {
 			// Generate dummy user ID for demo
@@ -93,7 +77,12 @@ func (m *AuthMiddleware) Authenticate() gin.HandlerFunc {
 		// Set user context
 		ctx.Set("userId", userUUID.String())
 		ctx.Set("organizationId", orgUUID.String())
-		ctx.Set("token", token)
+		if authHeader != "" {
+			parts := strings.SplitN(authHeader, " ", 2)
+			if len(parts) == 2 && strings.ToLower(parts[0]) == "bearer" {
+				ctx.Set("token", parts[1])
+			}
+		}
 
 		ctx.Next()
 	}

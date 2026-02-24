@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // PriorityService defines the interface for priority-related operations

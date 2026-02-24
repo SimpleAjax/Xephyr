@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // ProgressService defines the interface for progress-related operations

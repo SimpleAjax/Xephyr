@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // WorkloadService defines the interface for workload-related operations

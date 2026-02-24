@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // ScenarioService defines the interface for scenario-related operations
@@ -136,6 +136,24 @@ func (s *DummyScenarioService) SimulateScenario(ctx context.Context, scenarioID 
 					AffectedTasks: []string{"task-fit-1"},
 				},
 			},
+			AffectedTasks: []dto.AffectedTask{
+				{
+					TaskID:          "task-fit-1",
+					Title:           "Mobile App UI Design",
+					OriginalDueDate: timePtr(time.Now().UTC().Add(7 * 24 * time.Hour)),
+					NewDueDate:      timePtr(time.Now().UTC().Add(14 * 24 * time.Hour)),
+					DelayDays:       5,
+					Reason:          "Primary assignee on leave",
+				},
+			},
+			ResourceImpacts: []dto.ResourceImpact{
+				{
+					PersonID:          "user-emma",
+					CurrentAllocation: 125,
+					NewAllocation:     80,
+					Risk:              "medium",
+				},
+			},
 			TimelineComparison: dto.TimelineComparison{
 				OriginalEndDate: timePtr(time.Now().UTC().Add(60 * 24 * time.Hour)),
 				NewEndDate:      timePtr(time.Now().UTC().Add(67 * 24 * time.Hour)),
@@ -206,9 +224,13 @@ func (s *DummyScenarioService) RejectScenario(ctx context.Context, scenarioID st
 
 // ModifyScenario modifies dummy scenario
 func (s *DummyScenarioService) ModifyScenario(ctx context.Context, scenarioID string, req dto.ModifyScenarioRequest, orgID string) (*dto.ScenarioResponse, error) {
+	title := "Modified Scenario"
+	if req.Title != nil && *req.Title != "" {
+		title = *req.Title
+	}
 	return &dto.ScenarioResponse{
 		ScenarioID: scenarioID,
-		Title:      "Modified Scenario",
+		Title:      title,
 		ChangeType: "employee_leave",
 		Status:     "modified",
 		CreatedAt:  time.Now().UTC(),

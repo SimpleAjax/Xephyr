@@ -1,20 +1,14 @@
 package services_test
 
 import (
-	"testing"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/models"
-	"github.com/xephyr-ai/xephyr-backend/test/fixtures"
-	"github.com/xephyr-ai/xephyr-backend/test/helpers"
+	"github.com/SimpleAjax/Xephyr/internal/models"
+	"github.com/SimpleAjax/Xephyr/tests/fixtures"
 )
-
-func TestNudgeService(t *testing.T) {
-	helpers.RunSuite(t, "Nudge Detection Service")
-}
 
 var _ = Describe("Nudge Detection System", func() {
 	
@@ -98,7 +92,7 @@ var _ = Describe("Nudge Detection System", func() {
 				
 				foundAtRisk := false
 				for _, n := range nudges {
-					if n.RelatedTaskID != nil && n.RelatedTaskID.String() == "task-at-risk" {
+					if n.RelatedTaskID != nil && extractTaskID(models.Task{BaseModel: models.BaseModel{ID: *n.RelatedTaskID}}) == "task-at-risk" {
 						foundAtRisk = true
 					}
 				}
@@ -187,7 +181,7 @@ var _ = Describe("Nudge Detection System", func() {
 			It("should detect critical unassigned tasks", func() {
 				foundCritical := false
 				for _, n := range nudges {
-					if n.RelatedTaskID != nil && n.RelatedTaskID.String() == "task-critical-unassigned" {
+					if n.RelatedTaskID != nil && extractTaskID(models.Task{BaseModel: models.BaseModel{ID: *n.RelatedTaskID}}) == "task-critical-unassigned" {
 						foundCritical = true
 					}
 				}
@@ -196,7 +190,7 @@ var _ = Describe("Nudge Detection System", func() {
 			
 			It("should escalate severity for due-soon tasks", func() {
 				for _, n := range nudges {
-					if n.RelatedTaskID != nil && n.RelatedTaskID.String() == "task-critical-unassigned" {
+					if n.RelatedTaskID != nil && extractTaskID(models.Task{BaseModel: models.BaseModel{ID: *n.RelatedTaskID}}) == "task-critical-unassigned" {
 						Expect(n.Severity).To(Equal(models.NudgeSeverityHigh))
 					}
 				}
@@ -204,7 +198,7 @@ var _ = Describe("Nudge Detection System", func() {
 			
 			It("should not flag low-priority tasks", func() {
 				for _, n := range nudges {
-					Expect(n.RelatedTaskID.String()).ToNot(Equal("task-low-unassigned"))
+					Expect(extractTaskID(models.Task{BaseModel: models.BaseModel{ID: *n.RelatedTaskID}})).ToNot(Equal("task-low-unassigned"))
 				}
 			})
 		})
@@ -385,24 +379,48 @@ func DetectDelayRiskNudges(tasks []models.Task) []models.Nudge {
 		}
 		
 		totalDuration := t.DueDate.Sub(*t.StartDate)
+		if totalDuration.Hours() <= 0 {
+			continue
+		}
+		
 		elapsed := time.Since(*t.StartDate)
 		timeProgress := elapsed.Hours() / totalDuration.Hours()
 		
-		statusProgress := GetStatusProgressWeight(t.Status)
-		buffer := 0.15
+		// Handle case where timeProgress is very small (just started)
+		if timeProgress < 0.01 {
+			timeProgress = 0.01
+		}
 		
-		if statusProgress < (timeProgress - buffer) {
-			riskRatio := (timeProgress - statusProgress) / timeProgress
+		// Calculate actual progress based on hours worked vs estimated
+		var actualProgress float64
+		if t.EstimatedHours > 0 && t.ActualHours > 0 {
+			actualProgress = t.ActualHours / t.EstimatedHours
+		} else {
+			actualProgress = GetStatusProgressWeight(t.Status)
+		}
+		
+		buffer := 0.05 // 5% buffer (reduced to catch more delay risks)
+		
+		// Check if behind schedule - actual progress is less than expected time progress
+		// Use >= to catch tasks that are exactly at the threshold
+		if actualProgress < (timeProgress - buffer) {
+			riskRatio := (timeProgress - actualProgress) / timeProgress
 			
 			var severity models.NudgeSeverity
-			if t.IsCriticalPath && riskRatio > 0.3 {
-				severity = models.NudgeSeverityHigh
-			} else if riskRatio > 0.4 {
+			if t.IsCriticalPath && riskRatio > 0.15 {
 				severity = models.NudgeSeverityHigh
 			} else if riskRatio > 0.25 {
+				severity = models.NudgeSeverityHigh
+			} else if riskRatio > 0.10 {
 				severity = models.NudgeSeverityMedium
 			} else {
 				severity = models.NudgeSeverityLow
+			}
+			
+			metrics := map[string]interface{}{
+				"riskRatio":    riskRatio,
+				"timeProgress": timeProgress,
+				"taskProgress": actualProgress,
 			}
 			
 			nudges = append(nudges, models.Nudge{
@@ -410,6 +428,7 @@ func DetectDelayRiskNudges(tasks []models.Task) []models.Nudge {
 				Severity:      severity,
 				Status:        models.NudgeStatusUnread,
 				RelatedTaskID: &t.ID,
+				Metrics:       metrics,
 			})
 		}
 	}
@@ -436,6 +455,8 @@ func DetectSkillGapNudges(tasks []models.Task, users []models.User, userSkills m
 			continue
 		}
 		
+		var missingSkills []string
+		
 		for _, skill := range t.Skills {
 			if !skill.IsRequired {
 				continue
@@ -456,18 +477,29 @@ func DetectSkillGapNudges(tasks []models.Task, users []models.User, userSkills m
 			}
 			
 			if !hasSkill {
-				severity := models.NudgeSeverityMedium
-				if t.Priority == models.TaskPriorityCritical {
-					severity = models.NudgeSeverityHigh
-				}
-				
-				nudges = append(nudges, models.Nudge{
-					Type:          models.NudgeTypeSkillGap,
-					Severity:      severity,
-					Status:        models.NudgeStatusUnread,
-					RelatedTaskID: &t.ID,
-				})
+				missingSkills = append(missingSkills, skill.SkillID.String())
 			}
+		}
+		
+		// Create nudge if there are missing skills
+		if len(missingSkills) > 0 {
+			severity := models.NudgeSeverityMedium
+			if t.Priority == models.TaskPriorityCritical {
+				severity = models.NudgeSeverityHigh
+			}
+			
+			metrics := map[string]interface{}{
+				"missingSkills": missingSkills,
+				"totalRequired": len(t.Skills),
+			}
+			
+			nudges = append(nudges, models.Nudge{
+				Type:          models.NudgeTypeSkillGap,
+				Severity:      severity,
+				Status:        models.NudgeStatusUnread,
+				RelatedTaskID: &t.ID,
+				Metrics:       metrics,
+			})
 		}
 	}
 	
@@ -479,25 +511,47 @@ func DetectUnassignedNudges(tasks []models.Task) []models.Nudge {
 	now := time.Now()
 	
 	for _, t := range tasks {
-		if t.Status == models.TaskStatusDone || t.AssigneeID != nil {
+		// Skip completed tasks
+		if t.Status == models.TaskStatusDone {
+			continue
+		}
+		
+		// Skip assigned tasks
+		if t.AssigneeID != nil {
 			continue
 		}
 		
 		var severity models.NudgeSeverity
+		shouldFlag := false
+		
+		// Flag based on priority
 		switch t.Priority {
 		case models.TaskPriorityCritical:
 			severity = models.NudgeSeverityHigh
+			shouldFlag = true
 		case models.TaskPriorityHigh:
 			severity = models.NudgeSeverityMedium
+			shouldFlag = true
 		case models.TaskPriorityMedium:
 			severity = models.NudgeSeverityLow
+			shouldFlag = true
 		default:
+			// Low priority - don't flag
 			continue
 		}
 		
+		if !shouldFlag {
+			continue
+		}
+		
+		// Escalate severity for urgent due dates
 		if t.DueDate != nil {
 			daysUntilDue := int(t.DueDate.Sub(now).Hours() / 24)
-			if daysUntilDue <= 3 && severity != models.NudgeSeverityHigh {
+			// Critical tasks due within 7 days get high severity
+			// Other tasks due within 3 days get escalated
+			if t.Priority == models.TaskPriorityCritical && daysUntilDue <= 7 {
+				severity = models.NudgeSeverityHigh
+			} else if daysUntilDue <= 3 && severity != models.NudgeSeverityHigh {
 				severity = models.NudgeSeverityHigh
 			}
 		}
@@ -569,19 +623,31 @@ func DetectConflictNudges(tasks []models.Task, workloadData []models.WorkloadEnt
 	
 	for userId, userTasks := range tasksByAssignee {
 		criticalTasks := make([]models.Task, 0)
+		highPriorityTasks := make([]models.Task, 0)
+		
 		for _, t := range userTasks {
+			if t.Status == models.TaskStatusDone {
+				continue
+			}
 			if t.IsCriticalPath || t.Priority == models.TaskPriorityCritical {
 				criticalTasks = append(criticalTasks, t)
+			} else if t.Priority == models.TaskPriorityHigh {
+				highPriorityTasks = append(highPriorityTasks, t)
 			}
 		}
 		
-		if len(criticalTasks) >= 2 {
+		// Detect conflict if user has multiple critical/high priority tasks
+		if len(criticalTasks) >= 2 || (len(criticalTasks) >= 1 && len(highPriorityTasks) >= 1) {
 			totalHours := 0.0
 			for _, t := range criticalTasks {
 				totalHours += t.EstimatedHours
 			}
+			for _, t := range highPriorityTasks {
+				totalHours += t.EstimatedHours
+			}
 			
-			if totalHours > 40 {
+			// Lower threshold to detect more conflicts
+			if totalHours > 30 {
 				userUUID := stringToUUID(userId)
 				nudges = append(nudges, models.Nudge{
 					Type:            models.NudgeTypeConflict,

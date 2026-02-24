@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // NudgeService defines the interface for nudge-related operations
@@ -92,14 +92,21 @@ func (s *DummyNudgeService) ListNudges(ctx context.Context, params dto.NudgeList
 func (s *DummyNudgeService) GetNudge(ctx context.Context, nudgeID string, orgID string) (*dto.NudgeDetailResponse, error) {
 	return &dto.NudgeDetailResponse{
 		NudgeResponse: dto.NudgeResponse{
-			ID:       nudgeID,
-			Type:     "overload",
-			Severity: "high",
-			Status:   "unread",
-			Title:    "Sample Nudge",
-			Description: "This is a sample nudge",
+			ID:              nudgeID,
+			Type:            "overload",
+			Severity:        "high",
+			Status:          "unread",
+			Title:           "Sample Nudge",
+			Description:     "This is a sample nudge",
+			AIExplanation:   "This nudge was generated because Emma is overallocated at 125% capacity.",
 			CriticalityScore: 90,
-			CreatedAt:        time.Now().UTC(),
+			CreatedAt:       time.Now().UTC(),
+			SuggestedAction: dto.SuggestedAction{
+				Type:        "reassign",
+				Description: "Reassign Marketing Website consultation to Rachel",
+				TargetTaskID: strPtr("task-web-3"),
+				SuggestedAssigneeID: strPtr("user-rachel"),
+			},
 		},
 		History: []dto.NudgeAction{
 			{
@@ -113,6 +120,10 @@ func (s *DummyNudgeService) GetNudge(ctx context.Context, nudgeID string, orgID 
 
 // TakeNudgeAction processes a dummy action
 func (s *DummyNudgeService) TakeNudgeAction(ctx context.Context, nudgeID string, req dto.NudgeActionRequest, orgID string, userID uuid.UUID) (*dto.NudgeActionResponse, error) {
+	status := "acted"
+	if req.ActionType == "dismiss" {
+		status = "dismissed"
+	}
 	return &dto.NudgeActionResponse{
 		NudgeID:     nudgeID,
 		ActionTaken: req.ActionType,
@@ -122,9 +133,9 @@ func (s *DummyNudgeService) TakeNudgeAction(ctx context.Context, nudgeID string,
 			ToUserID:       "user-rachel",
 			TaskID:         "task-web-3",
 		},
-		NudgeStatus:   "acted",
+		NudgeStatus:    status,
 		FollowUpNudges: []string{},
-		CompletedAt:   time.Now().UTC(),
+		CompletedAt:    time.Now().UTC(),
 	}, nil
 }
 

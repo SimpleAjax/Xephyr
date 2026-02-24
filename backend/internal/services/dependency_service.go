@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
 )
 
 // DependencyService defines the interface for dependency-related operations
@@ -51,6 +51,7 @@ func (s *DummyDependencyService) GetTaskDependencies(ctx context.Context, taskID
 					IsBlocking:      true,
 				},
 			},
+			Indirect: []dto.IndirectDependency{},
 		},
 		Dependents: dto.DependentsSection{
 			Direct: []dto.DependentInfo{
@@ -60,6 +61,7 @@ func (s *DummyDependencyService) GetTaskDependencies(ctx context.Context, taskID
 					IsBlocked:      true,
 				},
 			},
+			Indirect: []dto.IndirectDependency{},
 		},
 		ChainAnalysis: dto.ChainAnalysis{
 			LongestChain:         3,
@@ -75,6 +77,12 @@ func (s *DummyDependencyService) GetTaskDependencies(ctx context.Context, taskID
 				Depth: 2,
 			},
 		}
+		resp.Dependents.Indirect = []dto.IndirectDependency{
+			{
+				Path:  []string{"task-ec-4", "task-ec-5", "task-ec-6"},
+				Depth: 2,
+			},
+		}
 	}
 
 	return resp, nil
@@ -82,6 +90,14 @@ func (s *DummyDependencyService) GetTaskDependencies(ctx context.Context, taskID
 
 // CreateDependency creates a dummy dependency
 func (s *DummyDependencyService) CreateDependency(ctx context.Context, req dto.CreateDependencyRequest, orgID string) (*dto.CreateDependencyResponse, error) {
+	// Check for circular dependency scenario (task-ec-1 depending on task-ec-4)
+	if req.TaskID == "task-ec-1" && req.DependsOnTaskID == "task-ec-4" {
+		return nil, &CircularDependencyError{
+			Message: "Circular dependency detected",
+			Cycle:   []string{"task-ec-1", "task-ec-4", "task-ec-2", "task-ec-1"},
+		}
+	}
+	
 	return &dto.CreateDependencyResponse{
 		DependencyID:    "dep-123",
 		TaskID:          req.TaskID,
@@ -99,6 +115,16 @@ func (s *DummyDependencyService) CreateDependency(ctx context.Context, req dto.C
 			NewProjectEndDate:   timePtr(time.Now().UTC().Add(30 * 24 * time.Hour)),
 		},
 	}, nil
+}
+
+// CircularDependencyError represents a circular dependency error
+type CircularDependencyError struct {
+	Message string
+	Cycle   []string
+}
+
+func (e *CircularDependencyError) Error() string {
+	return e.Message
 }
 
 // DeleteDependency is a no-op for dummy service

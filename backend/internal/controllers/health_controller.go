@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // HealthController handles health-related HTTP requests
@@ -26,6 +26,7 @@ func NewHealthController(service services.HealthService) *HealthController {
 // @Accept json
 // @Produce json
 // @Success 200 {object} dto.ApiResponse{data=dto.PortfolioHealthResponse}
+// @Security BearerAuth
 // @Router /health/portfolio [get]
 func (c *HealthController) GetPortfolioHealth(ctx *gin.Context) {
 	orgID := ctx.GetString("organizationId")
@@ -52,6 +53,7 @@ func (c *HealthController) GetPortfolioHealth(ctx *gin.Context) {
 // @Param includeBreakdown query bool false "Include health breakdown"
 // @Success 200 {object} dto.ApiResponse{data=dto.ProjectHealthResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /health/projects/{projectId} [get]
 func (c *HealthController) GetProjectHealth(ctx *gin.Context) {
 	projectID := ctx.Param("projectId")
@@ -81,17 +83,28 @@ func (c *HealthController) GetProjectHealth(ctx *gin.Context) {
 // @Tags health
 // @Accept json
 // @Produce json
-// @Param projectIds query []string true "Project IDs"
+// @Param projectIds query []string false "Project IDs"
 // @Success 200 {object} dto.ApiResponse{data=[]dto.ProjectHealthSummary}
+// @Security BearerAuth
 // @Router /health/projects [get]
 func (c *HealthController) GetBulkProjectHealth(ctx *gin.Context) {
 	projectIDs := ctx.QueryArray("projectIds")
+	orgID := ctx.GetString("organizationId")
+
+	// If no project IDs provided, get all projects from portfolio health
 	if len(projectIDs) == 0 {
-		ctx.JSON(http.StatusBadRequest, dto.NewErrorResponse("VALIDATION_ERROR", "projectIds required", nil, ctx.GetString("requestId")))
+		portfolioHealth, err := c.service.GetPortfolioHealth(ctx.Request.Context(), orgID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, dto.NewErrorResponse("INTERNAL_ERROR", err.Error(), nil, ctx.GetString("requestId")))
+			return
+		}
+		ctx.JSON(http.StatusOK, dto.NewSuccessResponse(portfolioHealth.Projects, dto.ResponseMeta{
+			Timestamp: getTimestamp(),
+			RequestID: ctx.GetString("requestId"),
+		}))
 		return
 	}
 
-	orgID := ctx.GetString("organizationId")
 	healths, err := c.service.GetBulkProjectHealth(ctx.Request.Context(), projectIDs, orgID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, dto.NewErrorResponse("INTERNAL_ERROR", err.Error(), nil, ctx.GetString("requestId")))
@@ -114,6 +127,7 @@ func (c *HealthController) GetBulkProjectHealth(ctx *gin.Context) {
 // @Param days query int false "Number of days" default(30)
 // @Success 200 {object} dto.ApiResponse{data=dto.HealthTrendsResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /health/trends [get]
 func (c *HealthController) GetHealthTrends(ctx *gin.Context) {
 	var params dto.HealthTrendsQueryParams

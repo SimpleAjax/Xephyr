@@ -1,20 +1,14 @@
 package services_test
 
 import (
-	"testing"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/models"
-	"github.com/xephyr-ai/xephyr-backend/test/fixtures"
-	"github.com/xephyr-ai/xephyr-backend/test/helpers"
+	"github.com/SimpleAjax/Xephyr/internal/models"
+	"github.com/SimpleAjax/Xephyr/tests/fixtures"
 )
-
-func TestHealthService(t *testing.T) {
-	helpers.RunSuite(t, "Health Scoring Service")
-}
 
 var _ = Describe("Health Scoring System", func() {
 	
@@ -384,16 +378,19 @@ func CalculateScheduleHealth(project models.Project, tasks []models.Task) int {
 	actualProgress := project.Progress
 	variance := actualProgress - expectedProgress
 	
-	if variance >= -5 {
+	// Use stricter thresholds - any negative variance reduces health
+	if variance >= 0 {
 		return 100
+	} else if variance >= -5 {
+		return 90
 	} else if variance >= -10 {
-		return 85
+		return 80
 	} else if variance >= -20 {
-		return 65
+		return 60
 	} else if variance >= -30 {
-		return 45
+		return 40
 	}
-	return 25
+	return 20
 }
 
 func CalculateCompletionHealth(tasks []models.Task) int {

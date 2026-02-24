@@ -1,0 +1,75 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: xephyr-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: xephyr
+      POSTGRES_PASSWORD: xephyr123
+      POSTGRES_DB: xephyr
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xephyr -d xephyr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - xephyr-network
+
+  # Redis (optional - for caching/sessions)
+  redis:
+    image: redis:7-alpine
+    container_name: xephyr-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - xephyr-network
+
+  # Backend API (optional - uncomment when ready)
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: xephyr-backend
+  #   restart: unless-stopped
+  #   environment:
+  #     - DB_HOST=postgres
+  #     - DB_PORT=5432
+  #     - DB_USER=${DB_USER:-xephyr}
+  #     - DB_PASSWORD=${DB_PASSWORD:-xephyr123}
+  #     - DB_NAME=${DB_NAME:-xephyr}
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - GIN_MODE=release
+  #   ports:
+  #     - "${API_PORT:-8080}:8080"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - xephyr-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  xephyr-network:
+    driver: bridge

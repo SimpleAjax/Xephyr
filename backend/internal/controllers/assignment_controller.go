@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // AssignmentController handles assignment-related HTTP requests
@@ -30,6 +30,7 @@ func NewAssignmentController(service services.AssignmentService) *AssignmentCont
 // @Param limit query int false "Number of suggestions" default(3)
 // @Success 200 {object} dto.ApiResponse{data=dto.AssignmentSuggestionsResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /assignments/suggestions [get]
 func (c *AssignmentController) GetAssignmentSuggestions(ctx *gin.Context) {
 	var params dto.AssignmentSuggestionsQueryParams
@@ -61,6 +62,7 @@ func (c *AssignmentController) GetAssignmentSuggestions(ctx *gin.Context) {
 // @Param request body dto.AssignTaskRequest true "Assignment request"
 // @Success 200 {object} dto.ApiResponse{data=dto.AssignTaskResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /assignments/tasks/{taskId}/assign [post]
 func (c *AssignmentController) AssignTask(ctx *gin.Context) {
 	taskID := ctx.Param("taskId")
@@ -96,6 +98,7 @@ func (c *AssignmentController) AssignTask(ctx *gin.Context) {
 // @Param request body dto.AutoAssignTaskRequest true "Auto-assignment request"
 // @Success 200 {object} dto.ApiResponse{data=dto.AssignTaskResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /assignments/tasks/{taskId}/auto-assign [post]
 func (c *AssignmentController) AutoAssignTask(ctx *gin.Context) {
 	taskID := ctx.Param("taskId")
@@ -131,6 +134,7 @@ func (c *AssignmentController) AutoAssignTask(ctx *gin.Context) {
 // @Param personId query string true "Person ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.AssignmentCompatibilityResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /assignments/compatibility [get]
 func (c *AssignmentController) CheckCompatibility(ctx *gin.Context) {
 	var params dto.CompatibilityQueryParams
@@ -161,6 +165,7 @@ func (c *AssignmentController) CheckCompatibility(ctx *gin.Context) {
 // @Param request body dto.BulkReassignRequest true "Bulk reassign request"
 // @Success 200 {object} dto.ApiResponse{data=dto.BulkReassignResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /assignments/bulk-reassign [post]
 func (c *AssignmentController) BulkReassign(ctx *gin.Context) {
 	orgID := ctx.GetString("organizationId")

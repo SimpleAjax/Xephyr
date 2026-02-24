@@ -1,0 +1,108 @@
+src/app/(dashboard)/dashboard/page.tsx(396,34): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/app/(dashboard)/kanban/page.tsx(57,38): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/app/(dashboard)/kanban/page.tsx(62,33): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/app/(dashboard)/kanban/page.tsx(66,26): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/(dashboard)/kanban/page.tsx(71,23): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/app/(dashboard)/kanban/page.tsx(116,29): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/app/(dashboard)/kanban/page.tsx(155,51): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/app/(dashboard)/kanban/page.tsx(181,74): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ low: string; medium: string; high: string; critical: string; }'.
+src/app/(dashboard)/nudges/page.tsx(58,38): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(59,36): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(60,41): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(62,44): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(63,46): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(64,43): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(286,47): error TS7006: Parameter 'n' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(348,39): error TS7006: Parameter 'nudge' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(360,41): error TS7006: Parameter 'nudge' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(372,38): error TS7006: Parameter 'nudge' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(397,27): error TS7006: Parameter 'nudge' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(404,29): error TS7006: Parameter 'nudge' implicitly has an 'any' type.
+src/app/(dashboard)/nudges/page.tsx(405,34): error TS7006: Parameter 'nudge' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(79,37): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(80,33): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(84,29): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(85,30): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(86,27): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(87,31): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(87,36): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(88,30): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(125,28): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(130,23): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(226,31): error TS7006: Parameter 'subtask' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(380,37): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(396,27): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(396,43): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(397,24): error TS7006: Parameter 'user' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(398,52): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/[id]/page.tsx(399,61): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(41,42): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(42,42): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(44,44): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(57,25): error TS7006: Parameter 't' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(145,47): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(145,52): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(186,36): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(254,34): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/app/(dashboard)/projects/page.tsx(286,36): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(42,41): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(47,51): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(48,52): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(49,52): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(143,54): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(143,59): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(177,38): error TS7006: Parameter 'scenario' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(227,79): error TS7006: Parameter 'rec' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(227,84): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(269,39): error TS7006: Parameter 'scenario' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(300,39): error TS7006: Parameter 'scenario' implicitly has an 'any' type.
+src/app/(dashboard)/scenarios/page.tsx(322,35): error TS7006: Parameter 'scenario' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(45,40): error TS7006: Parameter 'skill' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(52,35): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(52,40): error TS7006: Parameter 'skill' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(63,41): error TS7006: Parameter 'user' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(77,27): error TS7006: Parameter 'gap' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(130,45): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(130,50): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(151,30): error TS7006: Parameter 'gap' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(181,16): error TS18046: 'categorySkills' is of type 'unknown'.
+src/app/(dashboard)/skills/page.tsx(181,36): error TS7006: Parameter 'skill' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(223,38): error TS7006: Parameter '_' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(223,41): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/app/(dashboard)/skills/page.tsx(225,34): error TS7006: Parameter 'user' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(35,40): error TS7006: Parameter 'm' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(36,40): error TS7006: Parameter 'm' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(37,36): error TS7006: Parameter 'm' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(38,34): error TS7006: Parameter 'm' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(191,28): error TS7006: Parameter 'member' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(273,60): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(326,35): error TS7006: Parameter 'member' implicitly has an 'any' type.
+src/app/(dashboard)/team/page.tsx(350,57): error TS7006: Parameter 'task' implicitly has an 'any' type.
+src/components/tasks/create-task-dialog.tsx(340,37): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/components/tasks/create-task-dialog.tsx(384,35): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/components/tasks/create-task-dialog.tsx(384,65): error TS7006: Parameter 'user' implicitly has an 'any' type.
+src/components/tasks/create-task-dialog.tsx(396,31): error TS7006: Parameter 'skill' implicitly has an 'any' type.
+src/components/tasks/create-task-dialog.tsx(513,41): error TS7006: Parameter 'project' implicitly has an 'any' type.
+src/hooks/api/index.ts(11,1): error TS2308: Module './useAssignments' has already exported a member named 'useAssignTask'. Consider explicitly re-exporting to resolve the ambiguity.
+src/hooks/api/useAssignments.ts(16,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useDependencies.ts(17,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useHealth.ts(9,21): error TS2724: '"@/lib/api"' has no exported member named 'portfolioHealthKeys'. Did you mean 'PortfolioHealth'?
+src/hooks/api/useHealth.ts(9,42): error TS2724: '"@/lib/api"' has no exported member named 'projectHealthKeys'. Did you mean 'ProjectHealth'?
+src/hooks/api/useHealth.ts(11,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useNudges.ts(19,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useNudges.ts(104,78): error TS2345: Argument of type 'NudgeStatus' is not assignable to parameter of type '"read" | "dismissed" | "acted"'.
+  Type '"unread"' is not assignable to type '"read" | "dismissed" | "acted"'. Did you mean '"read"'?
+src/hooks/api/useProjects.ts(19,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useProjectsCRUD.ts(12,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useScenarios.ts(16,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useSkills.ts(10,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useTasks.ts(11,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useUsers.ts(11,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/hooks/api/useWorkload.ts(14,10): error TS2614: Module '"@/lib/api/client"' has no exported member 'ApiResponse'. Did you mean to use 'import ApiResponse from "@/lib/api/client"' instead?
+src/lib/api/health.ts(46,54): error TS2345: Argument of type 'HealthTrendParams | undefined' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined> | undefined'.
+  Type 'HealthTrendParams' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'HealthTrendParams'.
+src/lib/api/index.ts(18,1): error TS2308: Module './assignment' has already exported a member named 'assignTask'. Consider explicitly re-exporting to resolve the ambiguity.
+src/lib/api/priority.ts(38,5): error TS2345: Argument of type 'ProjectRankingParams | undefined' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined> | undefined'.
+  Type 'ProjectRankingParams' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'ProjectRankingParams'.

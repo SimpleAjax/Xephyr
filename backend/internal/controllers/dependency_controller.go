@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // DependencyController handles dependency-related HTTP requests
@@ -29,6 +29,7 @@ func NewDependencyController(service services.DependencyService) *DependencyCont
 // @Param includeIndirect query bool false "Include indirect dependencies"
 // @Success 200 {object} dto.ApiResponse{data=dto.TaskDependenciesResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /dependencies/tasks/{taskId} [get]
 func (c *DependencyController) GetTaskDependencies(ctx *gin.Context) {
 	taskID := ctx.Param("taskId")
@@ -62,6 +63,7 @@ func (c *DependencyController) GetTaskDependencies(ctx *gin.Context) {
 // @Success 201 {object} dto.ApiResponse{data=dto.CreateDependencyResponse}
 // @Failure 400 {object} dto.ApiResponse
 // @Failure 409 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /dependencies [post]
 func (c *DependencyController) CreateDependency(ctx *gin.Context) {
 	var req dto.CreateDependencyRequest
@@ -74,9 +76,9 @@ func (c *DependencyController) CreateDependency(ctx *gin.Context) {
 	dep, err := c.service.CreateDependency(ctx.Request.Context(), req, orgID)
 	if err != nil {
 		// Check for circular dependency error
-		if err.Error() == "circular dependency" {
+		if circularErr, ok := err.(*services.CircularDependencyError); ok {
 			details := map[string]interface{}{
-				"cycle": []string{req.TaskID, req.DependsOnTaskID, req.TaskID},
+				"cycle": circularErr.Cycle,
 			}
 			ctx.JSON(http.StatusConflict, dto.NewErrorResponse("CIRCULAR_DEPENDENCY", "This dependency would create a circular reference", details, ctx.GetString("requestId")))
 			return
@@ -100,6 +102,7 @@ func (c *DependencyController) CreateDependency(ctx *gin.Context) {
 // @Param dependencyId path string true "Dependency ID"
 // @Success 204 "No Content"
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /dependencies/{dependencyId} [delete]
 func (c *DependencyController) DeleteDependency(ctx *gin.Context) {
 	dependencyID := ctx.Param("dependencyId")
@@ -122,6 +125,7 @@ func (c *DependencyController) DeleteDependency(ctx *gin.Context) {
 // @Param projectId path string true "Project ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.CriticalPathResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /dependencies/critical-path/{projectId} [get]
 func (c *DependencyController) GetCriticalPath(ctx *gin.Context) {
 	projectID := ctx.Param("projectId")
@@ -148,6 +152,7 @@ func (c *DependencyController) GetCriticalPath(ctx *gin.Context) {
 // @Param request body dto.ValidateDependencyRequest true "Validation request"
 // @Success 200 {object} dto.ApiResponse{data=dto.ValidateDependencyResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /dependencies/validate [post]
 func (c *DependencyController) ValidateDependency(ctx *gin.Context) {
 	var req dto.ValidateDependencyRequest
@@ -178,6 +183,7 @@ func (c *DependencyController) ValidateDependency(ctx *gin.Context) {
 // @Param projectId path string true "Project ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.DependencyGraphResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /dependencies/graph/{projectId} [get]
 func (c *DependencyController) GetDependencyGraph(ctx *gin.Context) {
 	projectID := ctx.Param("projectId")

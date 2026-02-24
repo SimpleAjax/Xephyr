@@ -1,20 +1,14 @@
 package services_test
 
 import (
-	"testing"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/models"
-	"github.com/xephyr-ai/xephyr-backend/test/fixtures"
-	"github.com/xephyr-ai/xephyr-backend/test/helpers"
+	"github.com/SimpleAjax/Xephyr/internal/models"
+	"github.com/SimpleAjax/Xephyr/tests/fixtures"
 )
-
-func TestProgressService(t *testing.T) {
-	helpers.RunSuite(t, "Progress Tracking Service")
-}
 
 var _ = Describe("Progress Tracking System", func() {
 	

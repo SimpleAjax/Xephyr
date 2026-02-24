@@ -1,0 +1,3332 @@
+basePath: /api/v1
+definitions:
+  dto.AIRecommendation:
+    properties:
+      action:
+        type: string
+      estimatedImpact:
+        type: string
+      priority:
+        type: integer
+      reasoning:
+        type: string
+    type: object
+  dto.AffectedProject:
+    properties:
+      affectedTasks:
+        items:
+          type: string
+        type: array
+      delayDays:
+        type: integer
+      impact:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+    type: object
+  dto.AffectedTask:
+    properties:
+      delayDays:
+        type: integer
+      newDueDate:
+        type: string
+      originalDueDate:
+        type: string
+      reason:
+        type: string
+      suggestedReassignment:
+        $ref: '#/definitions/dto.SuggestedReassignment'
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.ApiError:
+    properties:
+      code:
+        type: string
+      details:
+        additionalProperties: true
+        type: object
+      message:
+        type: string
+    type: object
+  dto.ApiResponse:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/dto.ApiError'
+      meta:
+        $ref: '#/definitions/dto.ResponseMeta'
+      success:
+        type: boolean
+    type: object
+  dto.ApplyScenarioRequest:
+    properties:
+      applyRecommendations:
+        type: boolean
+      notifyStakeholders:
+        type: boolean
+      selectedRecommendations:
+        items:
+          type: integer
+        type: array
+    type: object
+  dto.ApplyScenarioResponse:
+    properties:
+      appliedAt:
+        type: string
+      appliedBy:
+        type: string
+      changes:
+        $ref: '#/definitions/dto.ScenarioChanges'
+      followUp:
+        $ref: '#/definitions/dto.ScenarioFollowUp'
+      scenarioId:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.AssignTaskRequest:
+    properties:
+      note:
+        type: string
+      personId:
+        type: string
+      skipSuggestion:
+        type: boolean
+    required:
+    - personId
+    type: object
+  dto.AssignTaskResponse:
+    properties:
+      assignedTo:
+        $ref: '#/definitions/dto.AssigneeInfo'
+      assignment:
+        $ref: '#/definitions/dto.AssignmentInfo'
+      impact:
+        $ref: '#/definitions/dto.AssignmentImpact'
+      previousAssignee:
+        $ref: '#/definitions/dto.AssigneeInfo'
+      taskId:
+        type: string
+    type: object
+  dto.AssigneeInfo:
+    properties:
+      name:
+        type: string
+      personId:
+        type: string
+    type: object
+  dto.AssignmentCandidate:
+    properties:
+      aiExplanation:
+        type: string
+      breakdown:
+        $ref: '#/definitions/dto.CandidateBreakdown'
+      contextSwitchAnalysis:
+        $ref: '#/definitions/dto.ContextSwitchAnalysis'
+      person:
+        $ref: '#/definitions/dto.PersonInfo'
+      rank:
+        type: integer
+      score:
+        type: integer
+      skillMatchDetails:
+        items:
+          $ref: '#/definitions/dto.SkillMatchDetail'
+        type: array
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.AssignmentCompatibilityResponse:
+    properties:
+      aiExplanation:
+        type: string
+      breakdown:
+        $ref: '#/definitions/dto.CompatibilityBreakdown'
+      isCompatible:
+        type: boolean
+      personId:
+        type: string
+      personName:
+        type: string
+      score:
+        type: integer
+      taskId:
+        type: string
+      warnings:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.AssignmentImpact:
+    properties:
+      newAllocation:
+        type: integer
+      notificationsSent:
+        items:
+          type: string
+        type: array
+      nudgesGenerated:
+        items:
+          type: string
+        type: array
+      workloadUpdated:
+        type: boolean
+    type: object
+  dto.AssignmentInfo:
+    properties:
+      assignedAt:
+        type: string
+      assignedBy:
+        type: string
+    type: object
+  dto.AssignmentSuggestionsResponse:
+    properties:
+      candidates:
+        items:
+          $ref: '#/definitions/dto.AssignmentCandidate'
+        type: array
+      requiredSkills:
+        items:
+          type: string
+        type: array
+      taskId:
+        type: string
+      taskTitle:
+        type: string
+      unassignableReason:
+        type: string
+    type: object
+  dto.AutoAssignConstraints:
+    properties:
+      maxAllocation:
+        maximum: 200
+        minimum: 0
+        type: integer
+      requiredProficiency:
+        maximum: 4
+        minimum: 1
+        type: integer
+    type: object
+  dto.AutoAssignTaskRequest:
+    properties:
+      constraints:
+        $ref: '#/definitions/dto.AutoAssignConstraints'
+      strategy:
+        enum:
+        - best_match
+        - balanced_workload
+        - fastest_completion
+        type: string
+    required:
+    - strategy
+    type: object
+  dto.AvailabilityWindow:
+    properties:
+      nextWeek:
+        type: number
+      thisWeek:
+        type: number
+    type: object
+  dto.BulkPriorityRequest:
+    properties:
+      includeBreakdown:
+        type: boolean
+      taskIds:
+        items:
+          type: string
+        maxItems: 100
+        minItems: 1
+        type: array
+    required:
+    - taskIds
+    type: object
+  dto.BulkPriorityResponse:
+    properties:
+      priorities:
+        items:
+          $ref: '#/definitions/dto.TaskPrioritySummary'
+        type: array
+      sortedOrder:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.BulkReassignRequest:
+    properties:
+      reason:
+        type: string
+      reassignments:
+        items:
+          $ref: '#/definitions/dto.ReassignmentItem'
+        maxItems: 50
+        minItems: 1
+        type: array
+    required:
+    - reassignments
+    type: object
+  dto.BulkReassignResponse:
+    properties:
+      completedAt:
+        type: string
+      failed:
+        type: integer
+      processed:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/dto.ReassignmentResult'
+        type: array
+      succeeded:
+        type: integer
+    type: object
+  dto.ByHierarchyBreakdown:
+    properties:
+      subtasks:
+        $ref: '#/definitions/dto.HierarchyItem'
+      tasks:
+        $ref: '#/definitions/dto.HierarchyItem'
+    type: object
+  dto.ByStatusBreakdown:
+    properties:
+      backlog:
+        $ref: '#/definitions/dto.StatusBreakdown'
+      done:
+        $ref: '#/definitions/dto.StatusBreakdown'
+      in_progress:
+        $ref: '#/definitions/dto.StatusBreakdown'
+      ready:
+        $ref: '#/definitions/dto.StatusBreakdown'
+      review:
+        $ref: '#/definitions/dto.StatusBreakdown'
+    type: object
+  dto.CandidateBreakdown:
+    properties:
+      availability:
+        type: integer
+      pastPerformance:
+        type: integer
+      skillMatch:
+        type: integer
+      workloadBalance:
+        type: integer
+    type: object
+  dto.ChainAnalysis:
+    properties:
+      criticalPathPosition:
+        type: string
+      floatHours:
+        type: integer
+      longestChain:
+        type: integer
+    type: object
+  dto.CompatibilityBreakdown:
+    properties:
+      availability:
+        type: integer
+      pastPerformance:
+        type: integer
+      skillMatch:
+        type: integer
+      workloadBalance:
+        type: integer
+    type: object
+  dto.CompletionDetails:
+    properties:
+      completed:
+        type: integer
+      completionRate:
+        type: integer
+      inProgress:
+        type: integer
+      totalTasks:
+        type: integer
+    type: object
+  dto.ContextSwitchAnalysis:
+    properties:
+      activeProjects:
+        type: integer
+      currentWorkload:
+        type: integer
+      riskLevel:
+        type: string
+      switchPenalty:
+        type: integer
+    type: object
+  dto.CostAnalysis:
+    properties:
+      breakdown:
+        items:
+          $ref: '#/definitions/dto.CostBreakdownItem'
+        type: array
+      confidence:
+        type: number
+      totalCost:
+        type: number
+    type: object
+  dto.CostBreakdownItem:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+    type: object
+  dto.CreateDependencyRequest:
+    properties:
+      dependencyType:
+        enum:
+        - finish_to_start
+        - start_to_start
+        - finish_to_finish
+        - start_to_finish
+        type: string
+      dependsOnTaskId:
+        type: string
+      lagHours:
+        minimum: 0
+        type: integer
+      taskId:
+        type: string
+    required:
+    - dependencyType
+    - dependsOnTaskId
+    - taskId
+    type: object
+  dto.CreateDependencyResponse:
+    properties:
+      createdAt:
+        type: string
+      dependencyId:
+        type: string
+      dependencyType:
+        type: string
+      dependsOnTaskId:
+        type: string
+      impact:
+        $ref: '#/definitions/dto.DependencyImpact'
+      lagHours:
+        type: integer
+      taskId:
+        type: string
+      validation:
+        $ref: '#/definitions/dto.DependencyValidation'
+    type: object
+  dto.CreateScenarioRequest:
+    properties:
+      changeType:
+        enum:
+        - employee_leave
+        - scope_change
+        - reallocation
+        - priority_shift
+        type: string
+      description:
+        type: string
+      proposedChanges:
+        $ref: '#/definitions/dto.ProposedChanges'
+      title:
+        maxLength: 200
+        type: string
+    required:
+    - changeType
+    - proposedChanges
+    - title
+    type: object
+  dto.CriticalPathInfo:
+    properties:
+      taskIds:
+        items:
+          type: string
+        type: array
+      tasks:
+        items:
+          $ref: '#/definitions/dto.CriticalPathTask'
+        type: array
+      totalDuration:
+        type: integer
+    type: object
+  dto.CriticalPathResponse:
+    properties:
+      calculatedAt:
+        type: string
+      criticalPath:
+        $ref: '#/definitions/dto.CriticalPathInfo'
+      nonCriticalTasks:
+        items:
+          $ref: '#/definitions/dto.NonCriticalTask'
+        type: array
+      projectDuration:
+        type: integer
+      projectId:
+        type: string
+    type: object
+  dto.CriticalPathTask:
+    properties:
+      earliestFinish:
+        type: string
+      earliestStart:
+        type: string
+      estimatedHours:
+        type: integer
+      floatHours:
+        type: integer
+      latestFinish:
+        type: string
+      latestStart:
+        type: string
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.DateAdjustment:
+    properties:
+      newDueDate:
+        type: string
+      originalDueDate:
+        type: string
+      taskId:
+        type: string
+    type: object
+  dto.DependencyDetails:
+    properties:
+      atRisk:
+        type: integer
+      blocked:
+        type: integer
+      total:
+        type: integer
+    type: object
+  dto.DependencyGraphEdge:
+    properties:
+      id:
+        type: string
+      lagHours:
+        type: integer
+      source:
+        type: string
+      target:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.DependencyGraphNode:
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  dto.DependencyGraphResponse:
+    properties:
+      edges:
+        items:
+          $ref: '#/definitions/dto.DependencyGraphEdge'
+        type: array
+      nodes:
+        items:
+          $ref: '#/definitions/dto.DependencyGraphNode'
+        type: array
+      projectId:
+        type: string
+    type: object
+  dto.DependencyImpact:
+    properties:
+      affectedTasks:
+        items:
+          type: string
+        type: array
+      criticalPathChanged:
+        type: boolean
+      newProjectEndDate:
+        type: string
+    type: object
+  dto.DependencyInfo:
+    properties:
+      dependencyId:
+        type: string
+      dependencyType:
+        type: string
+      dependsOnTaskId:
+        type: string
+      isBlocking:
+        type: boolean
+      lagHours:
+        type: integer
+      status:
+        type: string
+    type: object
+  dto.DependencySection:
+    properties:
+      direct:
+        items:
+          $ref: '#/definitions/dto.DependencyInfo'
+        type: array
+      indirect:
+        items:
+          $ref: '#/definitions/dto.IndirectDependency'
+        type: array
+    type: object
+  dto.DependencyValidation:
+    properties:
+      valid:
+        type: boolean
+      wouldCreateCycle:
+        type: boolean
+    type: object
+  dto.DependencyWarning:
+    properties:
+      message:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.DependentInfo:
+    properties:
+      dependencyType:
+        type: string
+      isBlocked:
+        type: boolean
+      taskId:
+        type: string
+    type: object
+  dto.DependentsSection:
+    properties:
+      direct:
+        items:
+          $ref: '#/definitions/dto.DependentInfo'
+        type: array
+      indirect:
+        items:
+          $ref: '#/definitions/dto.IndirectDependency'
+        type: array
+    type: object
+  dto.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.GenerateNudgesRequest:
+    properties:
+      async:
+        type: boolean
+      projectId:
+        type: string
+      scope:
+        enum:
+        - project
+        - organization
+        type: string
+      types:
+        items:
+          type: string
+        type: array
+    required:
+    - scope
+    type: object
+  dto.HealthBreakdown:
+    properties:
+      completionHealth:
+        type: integer
+      criticalPathHealth:
+        type: integer
+      dependencyHealth:
+        type: integer
+      resourceHealth:
+        type: integer
+      scheduleHealth:
+        type: integer
+    type: object
+  dto.HealthDatapoint:
+    properties:
+      completionHealth:
+        type: integer
+      date:
+        type: string
+      healthScore:
+        type: integer
+      scheduleHealth:
+        type: integer
+    type: object
+  dto.HealthDetails:
+    properties:
+      completion:
+        $ref: '#/definitions/dto.CompletionDetails'
+      dependencies:
+        $ref: '#/definitions/dto.DependencyDetails'
+      resources:
+        $ref: '#/definitions/dto.ResourceDetails'
+      schedule:
+        $ref: '#/definitions/dto.ScheduleDetails'
+    type: object
+  dto.HealthTrend:
+    properties:
+      change:
+        type: integer
+      direction:
+        type: string
+      lastWeekScore:
+        type: integer
+    type: object
+  dto.HealthTrendAnalysis:
+    properties:
+      direction:
+        type: string
+      prediction:
+        $ref: '#/definitions/dto.HealthTrendPrediction'
+      slope:
+        type: number
+    type: object
+  dto.HealthTrendPrediction:
+    properties:
+      confidence:
+        type: number
+      daysUntilCritical:
+        type: integer
+    type: object
+  dto.HealthTrendsResponse:
+    properties:
+      datapoints:
+        items:
+          $ref: '#/definitions/dto.HealthDatapoint'
+        type: array
+      projectId:
+        type: string
+      timeRange:
+        type: string
+      trend:
+        $ref: '#/definitions/dto.HealthTrendAnalysis'
+    type: object
+  dto.HierarchyItem:
+    properties:
+      completed:
+        type: integer
+      total:
+        type: integer
+    type: object
+  dto.IDResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  dto.ImpactAnalysis:
+    properties:
+      affectedProjects:
+        items:
+          $ref: '#/definitions/dto.AffectedProject'
+        type: array
+      affectedTasks:
+        items:
+          $ref: '#/definitions/dto.AffectedTask'
+        type: array
+      costAnalysis:
+        $ref: '#/definitions/dto.CostAnalysis'
+      resourceImpacts:
+        items:
+          $ref: '#/definitions/dto.ResourceImpact'
+        type: array
+      timelineComparison:
+        $ref: '#/definitions/dto.TimelineComparison'
+    type: object
+  dto.ImpactAnalysisSummary:
+    properties:
+      affectedProjects:
+        type: integer
+      costImpact:
+        type: number
+      totalDelayDays:
+        type: integer
+    type: object
+  dto.IndirectDependency:
+    properties:
+      depth:
+        type: integer
+      path:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.IndividualWorkloadResponse:
+    properties:
+      currentAllocation:
+        $ref: '#/definitions/dto.MemberAllocation'
+      historicalTrend:
+        items:
+          $ref: '#/definitions/dto.UtilizationTrend'
+        type: array
+      name:
+        type: string
+      personId:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/dto.TaskAllocation'
+        type: array
+      upcomingWeeks:
+        items:
+          $ref: '#/definitions/dto.WeeklyForecast'
+        type: array
+    type: object
+  dto.MemberAllocation:
+    properties:
+      assignedHours:
+        type: number
+      capacityHours:
+        type: number
+      percentage:
+        type: integer
+    type: object
+  dto.Milestone:
+    properties:
+      completedAt:
+        type: string
+      status:
+        type: string
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.ModifyScenarioRequest:
+    properties:
+      description:
+        type: string
+      proposedChanges:
+        $ref: '#/definitions/dto.ProposedChanges'
+      title:
+        type: string
+    type: object
+  dto.NonCriticalTask:
+    properties:
+      floatHours:
+        type: integer
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.NudgeAction:
+    properties:
+      action:
+        type: string
+      timestamp:
+        type: string
+      userId:
+        type: string
+    type: object
+  dto.NudgeActionRequest:
+    properties:
+      actionType:
+        enum:
+        - accept_suggestion
+        - dismiss
+        - custom_action
+        - ask_alternatives
+        - snooze
+        type: string
+      parameters:
+        additionalProperties: true
+        type: object
+    required:
+    - actionType
+    type: object
+  dto.NudgeActionResponse:
+    properties:
+      actionTaken:
+        type: string
+      completedAt:
+        type: string
+      followUpNudges:
+        items:
+          type: string
+        type: array
+      nudgeId:
+        type: string
+      nudgeStatus:
+        type: string
+      result:
+        $ref: '#/definitions/dto.NudgeActionResult'
+    type: object
+  dto.NudgeActionResult:
+    properties:
+      fromUserId:
+        type: string
+      taskId:
+        type: string
+      taskReassigned:
+        type: boolean
+      toUserId:
+        type: string
+    type: object
+  dto.NudgeDetailResponse:
+    properties:
+      aiExplanation:
+        type: string
+      createdAt:
+        type: string
+      criticalityScore:
+        type: integer
+      description:
+        type: string
+      expiresAt:
+        type: string
+      history:
+        items:
+          $ref: '#/definitions/dto.NudgeAction'
+        type: array
+      id:
+        type: string
+      metrics:
+        $ref: '#/definitions/dto.NudgeMetrics'
+      relatedEntities:
+        $ref: '#/definitions/dto.RelatedEntities'
+      severity:
+        type: string
+      status:
+        type: string
+      suggestedAction:
+        $ref: '#/definitions/dto.SuggestedAction'
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.NudgeListResponse:
+    properties:
+      nudges:
+        items:
+          $ref: '#/definitions/dto.NudgeResponse'
+        type: array
+      summary:
+        $ref: '#/definitions/dto.NudgeSummary'
+    type: object
+  dto.NudgeMetrics:
+    properties:
+      allocationPercentage:
+        type: integer
+      assignedTasks:
+        type: integer
+      totalHours:
+        type: number
+    type: object
+  dto.NudgeResponse:
+    properties:
+      aiExplanation:
+        type: string
+      createdAt:
+        type: string
+      criticalityScore:
+        type: integer
+      description:
+        type: string
+      expiresAt:
+        type: string
+      id:
+        type: string
+      metrics:
+        $ref: '#/definitions/dto.NudgeMetrics'
+      relatedEntities:
+        $ref: '#/definitions/dto.RelatedEntities'
+      severity:
+        type: string
+      status:
+        type: string
+      suggestedAction:
+        $ref: '#/definitions/dto.SuggestedAction'
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.NudgeStatsResponse:
+    properties:
+      acted:
+        type: integer
+      actionRate:
+        type: number
+      avgTimeToAction:
+        type: string
+      byType:
+        additionalProperties:
+          $ref: '#/definitions/dto.NudgeTypeStats'
+        type: object
+      dismissed:
+        type: integer
+      expired:
+        type: integer
+      generated:
+        type: integer
+      period:
+        type: string
+    type: object
+  dto.NudgeSummary:
+    properties:
+      bySeverity:
+        additionalProperties:
+          type: integer
+        type: object
+      byType:
+        additionalProperties:
+          type: integer
+        type: object
+      total:
+        type: integer
+      unread:
+        type: integer
+    type: object
+  dto.NudgeTypeStats:
+    properties:
+      acted:
+        type: integer
+      generated:
+        type: integer
+    type: object
+  dto.PersonInfo:
+    properties:
+      avatarUrl:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.PortfolioHealthResponse:
+    properties:
+      calculatedAt:
+        type: string
+      portfolioHealthScore:
+        type: integer
+      projects:
+        items:
+          $ref: '#/definitions/dto.ProjectHealthSummary'
+        type: array
+      status:
+        type: string
+      summary:
+        $ref: '#/definitions/dto.PortfolioHealthSummary'
+    type: object
+  dto.PortfolioHealthSummary:
+    properties:
+      atRisk:
+        type: integer
+      caution:
+        type: integer
+      critical:
+        type: integer
+      healthy:
+        type: integer
+      totalProjects:
+        type: integer
+    type: object
+  dto.PriorityBreakdown:
+    properties:
+      businessValue:
+        type: integer
+      criticalPathWeight:
+        type: integer
+      deadlineUrgency:
+        type: integer
+      dependencyImpact:
+        type: integer
+      projectPriority:
+        type: integer
+    type: object
+  dto.PriorityFactors:
+    properties:
+      blockedTasksCount:
+        type: integer
+      businessValue:
+        type: integer
+      daysUntilDue:
+        type: integer
+      deadlineUrgency:
+        type: integer
+      isOnCriticalPath:
+        type: boolean
+      projectPriority:
+        type: integer
+    type: object
+  dto.ProgressBreakdown:
+    properties:
+      byHierarchy:
+        $ref: '#/definitions/dto.ByHierarchyBreakdown'
+      byStatus:
+        $ref: '#/definitions/dto.ByStatusBreakdown'
+    type: object
+  dto.ProgressUpdateImpact:
+    properties:
+      dependentsNotified:
+        items:
+          type: string
+        type: array
+      parentProgressUpdated:
+        type: boolean
+      projectProgressUpdated:
+        type: boolean
+    type: object
+  dto.ProgressVariance:
+    properties:
+      actualProgress:
+        type: integer
+      expectedProgress:
+        type: integer
+      status:
+        type: string
+      variance:
+        type: integer
+    type: object
+  dto.ProjectAllocation:
+    properties:
+      percentage:
+        type: number
+      projectId:
+        type: string
+      projectName:
+        type: string
+      totalHours:
+        type: number
+    type: object
+  dto.ProjectHealthResponse:
+    properties:
+      breakdown:
+        $ref: '#/definitions/dto.HealthBreakdown'
+      calculatedAt:
+        type: string
+      details:
+        $ref: '#/definitions/dto.HealthDetails'
+      healthScore:
+        type: integer
+      projectId:
+        type: string
+      projectName:
+        type: string
+      status:
+        type: string
+      trend:
+        $ref: '#/definitions/dto.HealthTrend'
+    type: object
+  dto.ProjectHealthSummary:
+    properties:
+      healthScore:
+        type: integer
+      name:
+        type: string
+      priority:
+        type: integer
+      progress:
+        type: integer
+      projectId:
+        type: string
+      status:
+        type: string
+      trend:
+        type: string
+    type: object
+  dto.ProjectProgressResponse:
+    properties:
+      breakdown:
+        $ref: '#/definitions/dto.ProgressBreakdown'
+      calculatedAt:
+        type: string
+      calculationMethod:
+        type: string
+      milestones:
+        items:
+          $ref: '#/definitions/dto.Milestone'
+        type: array
+      progressPercentage:
+        type: integer
+      projectId:
+        type: string
+      variance:
+        $ref: '#/definitions/dto.ProgressVariance'
+    type: object
+  dto.ProjectRollupResponse:
+    properties:
+      calculatedAt:
+        type: string
+      progressPercentage:
+        type: integer
+      projectId:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/dto.RollupItem'
+        type: array
+    type: object
+  dto.ProjectTaskRankingResponse:
+    properties:
+      projectId:
+        type: string
+      rankings:
+        items:
+          $ref: '#/definitions/dto.TaskRankingItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.ProposedChanges:
+    properties:
+      coverageStrategy:
+        type: string
+      leaveEndDate:
+        type: string
+      leaveStartDate:
+        type: string
+      personId:
+        type: string
+    type: object
+  dto.ReassignmentChange:
+    properties:
+      from:
+        type: string
+      taskId:
+        type: string
+      to:
+        type: string
+    type: object
+  dto.ReassignmentItem:
+    properties:
+      fromPersonId:
+        type: string
+      taskId:
+        type: string
+      toPersonId:
+        type: string
+    required:
+    - fromPersonId
+    - taskId
+    - toPersonId
+    type: object
+  dto.ReassignmentResult:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ErrorInfo'
+      fromUser:
+        type: string
+      status:
+        type: string
+      taskId:
+        type: string
+      toUser:
+        type: string
+    type: object
+  dto.RebalanceSuggestion:
+    properties:
+      currentOwner:
+        type: string
+      impact:
+        type: string
+      reason:
+        type: string
+      suggestedOwner:
+        type: string
+      taskId:
+        type: string
+      taskTitle:
+        type: string
+    type: object
+  dto.RebalanceWorkloadRequest:
+    properties:
+      maxUtilization:
+        maximum: 120
+        minimum: 80
+        type: integer
+      personId:
+        type: string
+      projectId:
+        type: string
+      targetDate:
+        type: string
+    type: object
+  dto.RebalanceWorkloadResponse:
+    properties:
+      suggestions:
+        items:
+          $ref: '#/definitions/dto.RebalanceSuggestion'
+        type: array
+      totalImpact:
+        type: string
+    type: object
+  dto.RecalculatePriorityAsyncResponse:
+    properties:
+      estimatedDuration:
+        type: string
+      jobId:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.RecalculatePriorityRequest:
+    properties:
+      async:
+        type: boolean
+      projectId:
+        type: string
+      scope:
+        enum:
+        - project
+        - organization
+        - task
+        type: string
+    required:
+    - scope
+    type: object
+  dto.RecalculatePrioritySyncResponse:
+    properties:
+      affectedTasks:
+        items:
+          type: string
+        type: array
+      duration:
+        type: string
+      recalculated:
+        type: integer
+    type: object
+  dto.RejectScenarioResponse:
+    properties:
+      rejectedAt:
+        type: string
+      rejectedBy:
+        type: string
+      scenarioId:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.RelatedEntities:
+    properties:
+      personId:
+        type: string
+      projectId:
+        type: string
+      taskId:
+        type: string
+    type: object
+  dto.ResourceDetails:
+    properties:
+      avgAllocation:
+        type: integer
+      overallocated:
+        type: integer
+      teamSize:
+        type: integer
+      underutilized:
+        type: integer
+    type: object
+  dto.ResourceImpact:
+    properties:
+      currentAllocation:
+        type: integer
+      newAllocation:
+        type: integer
+      personId:
+        type: string
+      risk:
+        type: string
+    type: object
+  dto.ResponseMeta:
+    properties:
+      hasMore:
+        type: boolean
+      nextCursor:
+        type: string
+      page:
+        type: integer
+      perPage:
+        type: integer
+      requestId:
+        type: string
+      timestamp:
+        type: string
+      total:
+        type: integer
+    type: object
+  dto.RiskPeriod:
+    properties:
+      endWeek:
+        type: string
+      reason:
+        type: string
+      severity:
+        type: string
+      startWeek:
+        type: string
+    type: object
+  dto.RollupItem:
+    properties:
+      actualHours:
+        type: number
+      children:
+        items:
+          $ref: '#/definitions/dto.RollupItem'
+        type: array
+      estimatedHours:
+        type: number
+      progressPercentage:
+        type: integer
+      status:
+        type: string
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.ScenarioChanges:
+    properties:
+      datesAdjusted:
+        items:
+          $ref: '#/definitions/dto.DateAdjustment'
+        type: array
+      notificationsSent:
+        type: integer
+      tasksReassigned:
+        items:
+          $ref: '#/definitions/dto.ReassignmentChange'
+        type: array
+    type: object
+  dto.ScenarioDetailResponse:
+    properties:
+      aiRecommendations:
+        items:
+          $ref: '#/definitions/dto.AIRecommendation'
+        type: array
+      changeType:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      history:
+        items:
+          $ref: '#/definitions/dto.ScenarioHistoryEntry'
+        type: array
+      impactAnalysis:
+        $ref: '#/definitions/dto.ImpactAnalysis'
+      proposedChanges:
+        $ref: '#/definitions/dto.ProposedChanges'
+      scenarioId:
+        type: string
+      simulationStatus:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.ScenarioFollowUp:
+    properties:
+      calendarEventsCreated:
+        type: boolean
+      nudgesCreated:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.ScenarioHistoryEntry:
+    properties:
+      action:
+        type: string
+      timestamp:
+        type: string
+      userId:
+        type: string
+    type: object
+  dto.ScenarioListResponse:
+    properties:
+      scenarios:
+        items:
+          $ref: '#/definitions/dto.ScenarioResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.ScenarioResponse:
+    properties:
+      changeType:
+        type: string
+      createdAt:
+        type: string
+      impactAnalysis:
+        $ref: '#/definitions/dto.ImpactAnalysisSummary'
+      proposedChanges:
+        $ref: '#/definitions/dto.ProposedChanges'
+      scenarioId:
+        type: string
+      simulationStatus:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.ScheduleDetails:
+    properties:
+      actualProgress:
+        type: integer
+      daysUntilDeadline:
+        type: integer
+      expectedProgress:
+        type: integer
+      variance:
+        type: integer
+    type: object
+  dto.SimulateScenarioRequest:
+    properties:
+      depth:
+        enum:
+        - quick
+        - full
+        type: string
+      includeRecommendations:
+        type: boolean
+    type: object
+  dto.SimulateScenarioResponse:
+    properties:
+      aiRecommendations:
+        items:
+          $ref: '#/definitions/dto.AIRecommendation'
+        type: array
+      calculatedAt:
+        type: string
+      impactAnalysis:
+        $ref: '#/definitions/dto.ImpactAnalysis'
+      scenarioId:
+        type: string
+      simulationDuration:
+        type: string
+      simulationStatus:
+        type: string
+    type: object
+  dto.SkillMatchDetail:
+    properties:
+      hasSkill:
+        type: boolean
+      matchScore:
+        type: integer
+      proficiency:
+        type: integer
+      required:
+        type: boolean
+      skillId:
+        type: string
+    type: object
+  dto.StatusBreakdown:
+    properties:
+      count:
+        type: integer
+      hours:
+        type: number
+      percentage:
+        type: integer
+    type: object
+  dto.SubtaskProgress:
+    properties:
+      progressPercentage:
+        type: integer
+      status:
+        type: string
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.SuggestedAction:
+    properties:
+      description:
+        type: string
+      suggestedAssigneeId:
+        type: string
+      targetTaskId:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.SuggestedReassignment:
+    properties:
+      compatibility:
+        type: integer
+      toPersonId:
+        type: string
+    type: object
+  dto.TaskAllocation:
+    properties:
+      allocationThisWeek:
+        type: number
+      estimatedHours:
+        type: number
+      projectId:
+        type: string
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.TaskDependenciesResponse:
+    properties:
+      chainAnalysis:
+        $ref: '#/definitions/dto.ChainAnalysis'
+      dependencies:
+        $ref: '#/definitions/dto.DependencySection'
+      dependents:
+        $ref: '#/definitions/dto.DependentsSection'
+      taskId:
+        type: string
+    type: object
+  dto.TaskPriorityResponse:
+    properties:
+      breakdown:
+        $ref: '#/definitions/dto.PriorityBreakdown'
+      calculatedAt:
+        type: string
+      factors:
+        $ref: '#/definitions/dto.PriorityFactors'
+      rank:
+        type: integer
+      taskId:
+        type: string
+      universalPriorityScore:
+        type: integer
+    type: object
+  dto.TaskPrioritySummary:
+    properties:
+      rank:
+        type: integer
+      taskId:
+        type: string
+      universalPriorityScore:
+        type: integer
+    type: object
+  dto.TaskProgressResponse:
+    properties:
+      actualHours:
+        type: number
+      completedAt:
+        type: string
+      dueDate:
+        type: string
+      estimatedHours:
+        type: number
+      progressPercentage:
+        type: integer
+      remainingHours:
+        type: number
+      startDate:
+        type: string
+      status:
+        type: string
+      subtaskProgress:
+        items:
+          $ref: '#/definitions/dto.SubtaskProgress'
+        type: array
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.TaskProgressUpdateResponse:
+    properties:
+      actualHours:
+        type: number
+      affected:
+        $ref: '#/definitions/dto.ProgressUpdateImpact'
+      estimatedHours:
+        type: number
+      newStatus:
+        type: string
+      previousStatus:
+        type: string
+      progressPercentage:
+        type: integer
+      remainingHours:
+        type: number
+      taskId:
+        type: string
+    type: object
+  dto.TaskRankingItem:
+    properties:
+      assigneeId:
+        type: string
+      priorityScore:
+        type: integer
+      rank:
+        type: integer
+      status:
+        type: string
+      taskId:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.TeamMemberWorkload:
+    properties:
+      allocation:
+        $ref: '#/definitions/dto.MemberAllocation'
+      availability:
+        $ref: '#/definitions/dto.AvailabilityWindow'
+      name:
+        type: string
+      personId:
+        type: string
+      riskLevel:
+        type: string
+      role:
+        type: string
+      status:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/dto.TaskAllocation'
+        type: array
+    type: object
+  dto.TeamWorkloadResponse:
+    properties:
+      members:
+        items:
+          $ref: '#/definitions/dto.TeamMemberWorkload'
+        type: array
+      summary:
+        $ref: '#/definitions/dto.WorkloadSummary'
+      teamAllocation:
+        type: number
+      teamCapacity:
+        type: number
+      utilizationRate:
+        type: number
+      weekStarting:
+        type: string
+    type: object
+  dto.TimelineComparison:
+    properties:
+      newEndDate:
+        type: string
+      originalEndDate:
+        type: string
+      totalDelayDays:
+        type: integer
+    type: object
+  dto.UpdateNudgeStatusRequest:
+    properties:
+      status:
+        enum:
+        - unread
+        - read
+        - dismissed
+        - acted
+        type: string
+    required:
+    - status
+    type: object
+  dto.UpdateTaskProgressRequest:
+    properties:
+      actualHours:
+        minimum: 0
+        type: number
+      note:
+        type: string
+      progressPercentage:
+        maximum: 100
+        minimum: 0
+        type: integer
+      status:
+        enum:
+        - backlog
+        - ready
+        - in_progress
+        - review
+        - done
+        type: string
+    type: object
+  dto.UtilizationTrend:
+    properties:
+      date:
+        type: string
+      optimalCount:
+        type: integer
+      overCount:
+        type: integer
+      underCount:
+        type: integer
+      utilization:
+        type: number
+    type: object
+  dto.ValidateDependencyRequest:
+    properties:
+      dependencyType:
+        enum:
+        - finish_to_start
+        - start_to_start
+        - finish_to_finish
+        - start_to_finish
+        type: string
+      dependsOnTaskId:
+        type: string
+      taskId:
+        type: string
+    required:
+    - dependencyType
+    - dependsOnTaskId
+    - taskId
+    type: object
+  dto.ValidateDependencyResponse:
+    properties:
+      impact:
+        $ref: '#/definitions/dto.ValidationImpact'
+      valid:
+        type: boolean
+      warnings:
+        items:
+          $ref: '#/definitions/dto.DependencyWarning'
+        type: array
+      wouldCreateCycle:
+        type: boolean
+    type: object
+  dto.ValidationImpact:
+    properties:
+      affectedTasks:
+        type: integer
+      estimatedDelay:
+        type: integer
+    type: object
+  dto.WeeklyForecast:
+    properties:
+      allocation:
+        type: integer
+      assignedHours:
+        type: number
+      risk:
+        type: string
+      tasks:
+        type: integer
+      weekStarting:
+        type: string
+    type: object
+  dto.WorkloadAnalyticsResponse:
+    properties:
+      avgUtilization:
+        type: number
+      byProject:
+        items:
+          $ref: '#/definitions/dto.ProjectAllocation'
+        type: array
+      distribution:
+        $ref: '#/definitions/dto.WorkloadDistribution'
+      peakUtilization:
+        type: number
+      period:
+        type: string
+      trends:
+        items:
+          $ref: '#/definitions/dto.UtilizationTrend'
+        type: array
+    type: object
+  dto.WorkloadDistribution:
+    properties:
+      available:
+        type: integer
+      optimal:
+        type: integer
+      overallocated:
+        type: integer
+      underutilized:
+        type: integer
+    type: object
+  dto.WorkloadForecastResponse:
+    properties:
+      forecast:
+        items:
+          $ref: '#/definitions/dto.WeeklyForecast'
+        type: array
+      personId:
+        type: string
+      recommendations:
+        items:
+          type: string
+        type: array
+      riskPeriods:
+        items:
+          $ref: '#/definitions/dto.RiskPeriod'
+        type: array
+    type: object
+  dto.WorkloadSummary:
+    properties:
+      available:
+        type: integer
+      optimal:
+        type: integer
+      overallocated:
+        type: integer
+      underutilized:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Xephyr Project Management Intelligence API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Xephyr API
+  version: "1.0"
+paths:
+  /assignments/bulk-reassign:
+    post:
+      consumes:
+      - application/json
+      description: Reassign multiple tasks in bulk
+      parameters:
+      - description: Bulk reassign request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkReassignRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.BulkReassignResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Bulk reassign
+      tags:
+      - assignments
+  /assignments/compatibility:
+    get:
+      consumes:
+      - application/json
+      description: Check person-task compatibility
+      parameters:
+      - description: Task ID
+        in: query
+        name: taskId
+        required: true
+        type: string
+      - description: Person ID
+        in: query
+        name: personId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AssignmentCompatibilityResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Check compatibility
+      tags:
+      - assignments
+  /assignments/suggestions:
+    get:
+      consumes:
+      - application/json
+      description: Get AI-powered assignment suggestions for a task
+      parameters:
+      - description: Task ID
+        in: query
+        name: taskId
+        required: true
+        type: string
+      - default: 3
+        description: Number of suggestions
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AssignmentSuggestionsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get assignment suggestions
+      tags:
+      - assignments
+  /assignments/tasks/{taskId}/assign:
+    post:
+      consumes:
+      - application/json
+      description: Assign a task to a specific person
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Assignment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AssignTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AssignTaskResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Assign task
+      tags:
+      - assignments
+  /assignments/tasks/{taskId}/auto-assign:
+    post:
+      consumes:
+      - application/json
+      description: Automatically assign a task based on best match
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Auto-assignment request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AutoAssignTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AssignTaskResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Auto-assign task
+      tags:
+      - assignments
+  /dependencies:
+    post:
+      consumes:
+      - application/json
+      description: Create a new dependency between tasks
+      parameters:
+      - description: Dependency creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateDependencyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CreateDependencyResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Create dependency
+      tags:
+      - dependencies
+  /dependencies/{dependencyId}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a dependency
+      parameters:
+      - description: Dependency ID
+        in: path
+        name: dependencyId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete dependency
+      tags:
+      - dependencies
+  /dependencies/critical-path/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: Get the critical path for a project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CriticalPathResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get critical path
+      tags:
+      - dependencies
+  /dependencies/graph/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: Get the dependency graph for visualization
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DependencyGraphResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get dependency graph
+      tags:
+      - dependencies
+  /dependencies/tasks/{taskId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all dependencies for a specific task
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Include indirect dependencies
+        in: query
+        name: includeIndirect
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TaskDependenciesResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get task dependencies
+      tags:
+      - dependencies
+  /dependencies/validate:
+    post:
+      consumes:
+      - application/json
+      description: Validate a potential dependency without creating it
+      parameters:
+      - description: Validation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ValidateDependencyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ValidateDependencyResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Validate dependency
+      tags:
+      - dependencies
+  /health/portfolio:
+    get:
+      consumes:
+      - application/json
+      description: Get overall portfolio health score and project summaries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PortfolioHealthResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get portfolio health overview
+      tags:
+      - health
+  /health/projects:
+    get:
+      consumes:
+      - application/json
+      description: Get health summaries for multiple projects
+      parameters:
+      - collectionFormat: csv
+        description: Project IDs
+        in: query
+        items:
+          type: string
+        name: projectIds
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ProjectHealthSummary'
+                  type: array
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get bulk project health
+      tags:
+      - health
+  /health/projects/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed health metrics for a specific project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Include health breakdown
+        in: query
+        name: includeBreakdown
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProjectHealthResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get project health details
+      tags:
+      - health
+  /health/trends:
+    get:
+      consumes:
+      - application/json
+      description: Get health trend data over time
+      parameters:
+      - description: Project ID
+        in: query
+        name: projectId
+        required: true
+        type: string
+      - default: 30
+        description: Number of days
+        in: query
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.HealthTrendsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get health trends
+      tags:
+      - health
+  /nudges:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of nudges with optional filters
+      parameters:
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by severity
+        in: query
+        name: severity
+        type: string
+      - description: Filter by type
+        in: query
+        name: type
+        type: string
+      - description: Filter by project
+        in: query
+        name: projectId
+        type: string
+      - description: Filter by person
+        in: query
+        name: personId
+        type: string
+      - default: 20
+        description: Limit results
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.NudgeListResponse'
+                meta:
+                  $ref: '#/definitions/dto.ResponseMeta'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List nudges
+      tags:
+      - nudges
+  /nudges/{nudgeId}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific nudge
+      parameters:
+      - description: Nudge ID
+        in: path
+        name: nudgeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.NudgeDetailResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get single nudge
+      tags:
+      - nudges
+  /nudges/{nudgeId}/actions:
+    post:
+      consumes:
+      - application/json
+      description: Perform an action on a nudge (accept, dismiss, etc.)
+      parameters:
+      - description: Nudge ID
+        in: path
+        name: nudgeId
+        required: true
+        type: string
+      - description: Action request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.NudgeActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.NudgeActionResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Take action on nudge
+      tags:
+      - nudges
+  /nudges/{nudgeId}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Update the status of a nudge
+      parameters:
+      - description: Nudge ID
+        in: path
+        name: nudgeId
+        required: true
+        type: string
+      - description: Status update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateNudgeStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.NudgeResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Update nudge status
+      tags:
+      - nudges
+  /nudges/generate:
+    post:
+      consumes:
+      - application/json
+      description: Trigger manual nudge generation
+      parameters:
+      - description: Generation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GenerateNudgesRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.IDResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Generate nudges
+      tags:
+      - nudges
+  /nudges/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics about nudges
+      parameters:
+      - default: 30d
+        description: Time period
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.NudgeStatsResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get nudge statistics
+      tags:
+      - nudges
+  /priorities/projects/{projectId}/ranking:
+    get:
+      consumes:
+      - application/json
+      description: Get prioritized task ranking for a specific project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - description: Filter by assignee
+        in: query
+        name: assigneeId
+        type: string
+      - description: Minimum priority score
+        in: query
+        name: minScore
+        type: integer
+      - default: 50
+        description: Max results (default 50)
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProjectTaskRankingResponse'
+                meta:
+                  $ref: '#/definitions/dto.ResponseMeta'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get task ranking for project
+      tags:
+      - priorities
+  /priorities/recalculate:
+    post:
+      consumes:
+      - application/json
+      description: Trigger recalculation of priorities for a scope
+      parameters:
+      - description: Recalculation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RecalculatePriorityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RecalculatePrioritySyncResponse'
+              type: object
+        "202":
+          description: Accepted
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RecalculatePriorityAsyncResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Trigger priority recalculation
+      tags:
+      - priorities
+  /priorities/tasks/{taskId}:
+    get:
+      consumes:
+      - application/json
+      description: Get the priority score and breakdown for a specific task
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TaskPriorityResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get single task priority
+      tags:
+      - priorities
+  /priorities/tasks/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Get priority scores for multiple tasks in a single request
+      parameters:
+      - description: Bulk priority request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BulkPriorityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.BulkPriorityResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get priorities for multiple tasks
+      tags:
+      - priorities
+  /progress/projects/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: Get progress information for a project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProjectProgressResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get project progress
+      tags:
+      - progress
+  /progress/rollups/{projectId}:
+    get:
+      consumes:
+      - application/json
+      description: Get hierarchical progress rollup for a project
+      parameters:
+      - description: Project ID
+        in: path
+        name: projectId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProjectRollupResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get project rollup
+      tags:
+      - progress
+  /progress/tasks/{taskId}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed progress for a task
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TaskProgressResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get task progress
+      tags:
+      - progress
+  /progress/tasks/{taskId}/update:
+    post:
+      consumes:
+      - application/json
+      description: Update the progress of a task
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: Progress update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTaskProgressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TaskProgressUpdateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Update task progress
+      tags:
+      - progress
+  /scenarios:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of scenarios
+      parameters:
+      - description: Filter by status
+        in: query
+        name: status
+        type: string
+      - default: 20
+        description: Limit results
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ScenarioListResponse'
+                meta:
+                  $ref: '#/definitions/dto.ResponseMeta'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: List scenarios
+      tags:
+      - scenarios
+    post:
+      consumes:
+      - application/json
+      description: Create a new what-if scenario
+      parameters:
+      - description: Scenario creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateScenarioRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ScenarioResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Create scenario
+      tags:
+      - scenarios
+  /scenarios/{scenarioId}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a scenario
+      parameters:
+      - description: Scenario ID
+        in: path
+        name: scenarioId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ScenarioDetailResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get scenario
+      tags:
+      - scenarios
+  /scenarios/{scenarioId}/apply:
+    post:
+      consumes:
+      - application/json
+      description: Apply a scenario's changes
+      parameters:
+      - description: Scenario ID
+        in: path
+        name: scenarioId
+        required: true
+        type: string
+      - description: Apply request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ApplyScenarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ApplyScenarioResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Apply scenario
+      tags:
+      - scenarios
+  /scenarios/{scenarioId}/modify:
+    patch:
+      consumes:
+      - application/json
+      description: Modify an existing scenario
+      parameters:
+      - description: Scenario ID
+        in: path
+        name: scenarioId
+        required: true
+        type: string
+      - description: Modification request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ModifyScenarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ScenarioResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Modify scenario
+      tags:
+      - scenarios
+  /scenarios/{scenarioId}/reject:
+    post:
+      consumes:
+      - application/json
+      description: Reject a scenario
+      parameters:
+      - description: Scenario ID
+        in: path
+        name: scenarioId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RejectScenarioResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Reject scenario
+      tags:
+      - scenarios
+  /scenarios/{scenarioId}/simulate:
+    post:
+      consumes:
+      - application/json
+      description: Run a simulation for a scenario
+      parameters:
+      - description: Scenario ID
+        in: path
+        name: scenarioId
+        required: true
+        type: string
+      - description: Simulation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SimulateScenarioRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.SimulateScenarioResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Simulate scenario
+      tags:
+      - scenarios
+  /workload/analytics:
+    get:
+      consumes:
+      - application/json
+      description: Get workload analytics for the organization
+      parameters:
+      - default: 30d
+        description: Time period
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WorkloadAnalyticsResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get workload analytics
+      tags:
+      - workload
+  /workload/forecast:
+    get:
+      consumes:
+      - application/json
+      description: Get workload forecast for a person
+      parameters:
+      - description: Person ID
+        in: query
+        name: personId
+        required: true
+        type: string
+      - default: 8
+        description: Number of weeks
+        in: query
+        name: weeks
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WorkloadForecastResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get workload forecast
+      tags:
+      - workload
+  /workload/people/{personId}:
+    get:
+      consumes:
+      - application/json
+      description: Get workload for a specific person
+      parameters:
+      - description: Person ID
+        in: path
+        name: personId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.IndividualWorkloadResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get individual workload
+      tags:
+      - workload
+  /workload/rebalance:
+    post:
+      consumes:
+      - application/json
+      description: Get suggestions for rebalancing workload
+      parameters:
+      - description: Rebalance request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RebalanceWorkloadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RebalanceWorkloadResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ApiResponse'
+      security:
+      - BearerAuth: []
+      summary: Get rebalance suggestions
+      tags:
+      - workload
+  /workload/team:
+    get:
+      consumes:
+      - application/json
+      description: Get team workload overview
+      parameters:
+      - description: Week starting date
+        in: query
+        name: week
+        type: string
+      - description: Include forecast
+        in: query
+        name: includeForecast
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.ApiResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TeamWorkloadResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Get team workload
+      tags:
+      - workload
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

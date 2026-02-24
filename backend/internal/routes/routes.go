@@ -2,10 +2,13 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/controllers"
-	"github.com/xephyr-ai/xephyr-backend/internal/middleware"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/controllers"
+	"github.com/SimpleAjax/Xephyr/internal/middleware"
+	"github.com/SimpleAjax/Xephyr/internal/repositories"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // Router holds all application routes
@@ -23,6 +26,10 @@ func NewRouter(
 	assignmentCtrl *controllers.AssignmentController,
 	scenarioCtrl *controllers.ScenarioController,
 	workloadCtrl *controllers.WorkloadController,
+	projectCtrl *controllers.ProjectController,
+	taskCtrl *controllers.TaskController,
+	userCtrl *controllers.UserController,
+	skillCtrl *controllers.SkillController,
 	authMiddleware *middleware.AuthMiddleware,
 	orgMiddleware *middleware.OrganizationMiddleware,
 ) *Router {
@@ -39,8 +46,11 @@ func NewRouter(
 		ctx.JSON(200, gin.H{"status": "ok"})
 	})
 
+	// Swagger documentation (no auth required)
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	// API v1 group
-	v1 := router.Group("/v1")
+	v1 := router.Group("/api/v1")
 	{
 		// Apply auth middleware to all v1 routes
 		v1.Use(authMiddleware.Authenticate())
@@ -55,6 +65,10 @@ func NewRouter(
 		registerAssignmentRoutes(v1, assignmentCtrl)
 		registerScenarioRoutes(v1, scenarioCtrl)
 		registerWorkloadRoutes(v1, workloadCtrl)
+		registerProjectRoutes(v1, projectCtrl)
+		registerTaskRoutes(v1, taskCtrl)
+		registerUserRoutes(v1, userCtrl)
+		registerSkillRoutes(v1, skillCtrl)
 	}
 
 	// Handle 404s
@@ -218,17 +232,89 @@ func registerWorkloadRoutes(rg *gin.RouterGroup, ctrl *controllers.WorkloadContr
 	}
 }
 
-// SetupRoutes is a convenience function that creates all services, controllers and routes
-func SetupRoutes() *Router {
-	// Create services
-	priorityService := services.NewDummyPriorityService()
-	healthService := services.NewDummyHealthService()
-	nudgeService := services.NewDummyNudgeService()
-	progressService := services.NewDummyProgressService()
-	dependencyService := services.NewDummyDependencyService()
-	assignmentService := services.NewDummyAssignmentService()
-	scenarioService := services.NewDummyScenarioService()
-	workloadService := services.NewDummyWorkloadService()
+// registerProjectRoutes registers project module routes
+func registerProjectRoutes(rg *gin.RouterGroup, ctrl *controllers.ProjectController) {
+	if ctrl == nil {
+		return
+	}
+	projects := rg.Group("/projects")
+	{
+		// CRUD
+		projects.GET("", ctrl.ListProjects)
+		projects.POST("", ctrl.CreateProject)
+		projects.GET("/:projectId", ctrl.GetProject)
+		projects.PATCH("/:projectId", ctrl.UpdateProject)
+		projects.DELETE("/:projectId", ctrl.DeleteProject)
+
+		// Team
+		projects.GET("/:projectId/team", ctrl.GetProjectTeam)
+	}
+}
+
+// registerTaskRoutes registers task module routes
+func registerTaskRoutes(rg *gin.RouterGroup, ctrl *controllers.TaskController) {
+	if ctrl == nil {
+		return
+	}
+	tasks := rg.Group("/tasks")
+	{
+		// CRUD
+		tasks.GET("", ctrl.ListTasks)
+		tasks.POST("", ctrl.CreateTask)
+		tasks.GET("/:taskId", ctrl.GetTask)
+		tasks.PATCH("/:taskId", ctrl.UpdateTask)
+		tasks.DELETE("/:taskId", ctrl.DeleteTask)
+
+		// Status updates
+		tasks.POST("/:taskId/status", ctrl.UpdateTaskStatus)
+
+		// Assignment
+		tasks.POST("/:taskId/assign", ctrl.AssignTask)
+	}
+}
+
+// registerUserRoutes registers user module routes
+func registerUserRoutes(rg *gin.RouterGroup, ctrl *controllers.UserController) {
+	if ctrl == nil {
+		return
+	}
+	users := rg.Group("/users")
+	{
+		// CRUD
+		users.GET("", ctrl.ListUsers)
+		users.GET("/:userId", ctrl.GetUser)
+
+		// Skills
+		users.GET("/:userId/skills", ctrl.GetUserSkills)
+
+		// Workload
+		users.GET("/:userId/workload", ctrl.GetUserWorkload)
+	}
+}
+
+// registerSkillRoutes registers skill module routes
+func registerSkillRoutes(rg *gin.RouterGroup, ctrl *controllers.SkillController) {
+	if ctrl == nil {
+		return
+	}
+	skills := rg.Group("/skills")
+	{
+		skills.GET("", ctrl.ListSkills)
+		skills.GET("/gaps", ctrl.GetSkillGaps)
+	}
+}
+
+// SetupRoutesWithRepos creates all services, controllers and routes using real repositories
+func SetupRoutesWithRepos(repos *repositories.Provider) *Router {
+	// Create real services using repositories
+	priorityService := services.NewDummyPriorityService() // Keep dummy for now
+	healthService := services.NewRealHealthService(repos)
+	nudgeService := services.NewRealNudgeService(repos)
+	progressService := services.NewDummyProgressService() // Keep dummy for now
+	dependencyService := services.NewDummyDependencyService() // Keep dummy for now
+	assignmentService := services.NewDummyAssignmentService() // Keep dummy for now
+	scenarioService := services.NewRealScenarioService(repos)
+	workloadService := services.NewRealWorkloadService(repos)
 
 	// Create controllers
 	priorityCtrl := controllers.NewPriorityController(priorityService)
@@ -239,6 +325,10 @@ func SetupRoutes() *Router {
 	assignmentCtrl := controllers.NewAssignmentController(assignmentService)
 	scenarioCtrl := controllers.NewScenarioController(scenarioService)
 	workloadCtrl := controllers.NewWorkloadController(workloadService)
+	projectCtrl := controllers.NewProjectController(repos)
+	taskCtrl := controllers.NewTaskController(repos)
+	userCtrl := controllers.NewUserController(repos)
+	skillCtrl := controllers.NewSkillController(repos)
 
 	// Create middleware
 	authMiddleware := middleware.NewAuthMiddleware("dummy-secret")
@@ -254,7 +344,17 @@ func SetupRoutes() *Router {
 		assignmentCtrl,
 		scenarioCtrl,
 		workloadCtrl,
+		projectCtrl,
+		taskCtrl,
+		userCtrl,
+		skillCtrl,
 		authMiddleware,
 		orgMiddleware,
 	)
+}
+
+// SetupRoutes is deprecated - use SetupRoutesWithRepos instead
+// This function is kept for backward compatibility but will panic
+func SetupRoutes() *Router {
+	panic("SetupRoutes is deprecated - use SetupRoutesWithRepos with a repository provider instead")
 }

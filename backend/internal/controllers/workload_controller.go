@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // WorkloadController handles workload-related HTTP requests
@@ -28,6 +28,7 @@ func NewWorkloadController(service services.WorkloadService) *WorkloadController
 // @Param week query string false "Week starting date"
 // @Param includeForecast query bool false "Include forecast"
 // @Success 200 {object} dto.ApiResponse{data=dto.TeamWorkloadResponse}
+// @Security BearerAuth
 // @Router /workload/team [get]
 func (c *WorkloadController) GetTeamWorkload(ctx *gin.Context) {
 	var params dto.TeamWorkloadQueryParams
@@ -58,6 +59,7 @@ func (c *WorkloadController) GetTeamWorkload(ctx *gin.Context) {
 // @Param personId path string true "Person ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.IndividualWorkloadResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /workload/people/{personId} [get]
 func (c *WorkloadController) GetIndividualWorkload(ctx *gin.Context) {
 	personID := ctx.Param("personId")
@@ -85,6 +87,7 @@ func (c *WorkloadController) GetIndividualWorkload(ctx *gin.Context) {
 // @Param weeks query int false "Number of weeks" default(8)
 // @Success 200 {object} dto.ApiResponse{data=dto.WorkloadForecastResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /workload/forecast [get]
 func (c *WorkloadController) GetWorkloadForecast(ctx *gin.Context) {
 	var params dto.WorkloadForecastQueryParams
@@ -114,6 +117,7 @@ func (c *WorkloadController) GetWorkloadForecast(ctx *gin.Context) {
 // @Produce json
 // @Param period query string false "Time period" default(30d)
 // @Success 200 {object} dto.ApiResponse{data=dto.WorkloadAnalyticsResponse}
+// @Security BearerAuth
 // @Router /workload/analytics [get]
 func (c *WorkloadController) GetWorkloadAnalytics(ctx *gin.Context) {
 	var params dto.WorkloadAnalyticsQueryParams
@@ -144,6 +148,7 @@ func (c *WorkloadController) GetWorkloadAnalytics(ctx *gin.Context) {
 // @Param request body dto.RebalanceWorkloadRequest true "Rebalance request"
 // @Success 200 {object} dto.ApiResponse{data=dto.RebalanceWorkloadResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /workload/rebalance [post]
 func (c *WorkloadController) GetRebalanceSuggestions(ctx *gin.Context) {
 	var req dto.RebalanceWorkloadRequest

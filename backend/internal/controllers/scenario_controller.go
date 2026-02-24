@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // ScenarioController handles scenario-related HTTP requests
@@ -29,6 +29,7 @@ func NewScenarioController(service services.ScenarioService) *ScenarioController
 // @Param request body dto.CreateScenarioRequest true "Scenario creation request"
 // @Success 201 {object} dto.ApiResponse{data=dto.ScenarioResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /scenarios [post]
 func (c *ScenarioController) CreateScenario(ctx *gin.Context) {
 	var req dto.CreateScenarioRequest
@@ -63,6 +64,7 @@ func (c *ScenarioController) CreateScenario(ctx *gin.Context) {
 // @Param limit query int false "Limit results" default(20)
 // @Param offset query int false "Offset for pagination" default(0)
 // @Success 200 {object} dto.ApiResponse{data=dto.ScenarioListResponse,meta=dto.ResponseMeta}
+// @Security BearerAuth
 // @Router /scenarios [get]
 func (c *ScenarioController) ListScenarios(ctx *gin.Context) {
 	var params dto.ScenarioListQueryParams
@@ -98,6 +100,7 @@ func (c *ScenarioController) ListScenarios(ctx *gin.Context) {
 // @Param scenarioId path string true "Scenario ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.ScenarioDetailResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /scenarios/{scenarioId} [get]
 func (c *ScenarioController) GetScenario(ctx *gin.Context) {
 	scenarioID := ctx.Param("scenarioId")
@@ -125,6 +128,7 @@ func (c *ScenarioController) GetScenario(ctx *gin.Context) {
 // @Param request body dto.SimulateScenarioRequest true "Simulation request"
 // @Success 200 {object} dto.ApiResponse{data=dto.SimulateScenarioResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /scenarios/{scenarioId}/simulate [post]
 func (c *ScenarioController) SimulateScenario(ctx *gin.Context) {
 	scenarioID := ctx.Param("scenarioId")
@@ -158,6 +162,7 @@ func (c *ScenarioController) SimulateScenario(ctx *gin.Context) {
 // @Param request body dto.ApplyScenarioRequest true "Apply request"
 // @Success 200 {object} dto.ApiResponse{data=dto.ApplyScenarioResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /scenarios/{scenarioId}/apply [post]
 func (c *ScenarioController) ApplyScenario(ctx *gin.Context) {
 	scenarioID := ctx.Param("scenarioId")
@@ -192,6 +197,7 @@ func (c *ScenarioController) ApplyScenario(ctx *gin.Context) {
 // @Param scenarioId path string true "Scenario ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.RejectScenarioResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /scenarios/{scenarioId}/reject [post]
 func (c *ScenarioController) RejectScenario(ctx *gin.Context) {
 	scenarioID := ctx.Param("scenarioId")
@@ -221,6 +227,7 @@ func (c *ScenarioController) RejectScenario(ctx *gin.Context) {
 // @Param request body dto.ModifyScenarioRequest true "Modification request"
 // @Success 200 {object} dto.ApiResponse{data=dto.ScenarioResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /scenarios/{scenarioId}/modify [patch]
 func (c *ScenarioController) ModifyScenario(ctx *gin.Context) {
 	scenarioID := ctx.Param("scenarioId")

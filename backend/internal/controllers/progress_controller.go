@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/xephyr-ai/xephyr-backend/internal/dto"
-	"github.com/xephyr-ai/xephyr-backend/internal/services"
+	"github.com/SimpleAjax/Xephyr/internal/dto"
+	"github.com/SimpleAjax/Xephyr/internal/services"
 )
 
 // ProgressController handles progress-related HTTP requests
@@ -28,6 +28,7 @@ func NewProgressController(service services.ProgressService) *ProgressController
 // @Param projectId path string true "Project ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.ProjectProgressResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /progress/projects/{projectId} [get]
 func (c *ProgressController) GetProjectProgress(ctx *gin.Context) {
 	projectID := ctx.Param("projectId")
@@ -54,6 +55,7 @@ func (c *ProgressController) GetProjectProgress(ctx *gin.Context) {
 // @Param taskId path string true "Task ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.TaskProgressResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /progress/tasks/{taskId} [get]
 func (c *ProgressController) GetTaskProgress(ctx *gin.Context) {
 	taskID := ctx.Param("taskId")
@@ -81,6 +83,7 @@ func (c *ProgressController) GetTaskProgress(ctx *gin.Context) {
 // @Param request body dto.UpdateTaskProgressRequest true "Progress update request"
 // @Success 200 {object} dto.ApiResponse{data=dto.TaskProgressUpdateResponse}
 // @Failure 400 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /progress/tasks/{taskId}/update [post]
 func (c *ProgressController) UpdateTaskProgress(ctx *gin.Context) {
 	taskID := ctx.Param("taskId")
@@ -114,6 +117,7 @@ func (c *ProgressController) UpdateTaskProgress(ctx *gin.Context) {
 // @Param projectId path string true "Project ID"
 // @Success 200 {object} dto.ApiResponse{data=dto.ProjectRollupResponse}
 // @Failure 404 {object} dto.ApiResponse
+// @Security BearerAuth
 // @Router /progress/rollups/{projectId} [get]
 func (c *ProgressController) GetProjectRollup(ctx *gin.Context) {
 	projectID := ctx.Param("projectId")
